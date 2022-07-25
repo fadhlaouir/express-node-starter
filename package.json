@@ -1,0 +1,54 @@
+{
+    "name": "api-architecture",
+    "version": "1.0.0",
+    "main": "index.js",
+    "scripts": {
+        "test": "z",
+        "start": "NODE_ENV=production && node index.js",
+        "develop": "SET NODE_ENV=development&& nodemon index.js",
+        "lint:check": "eslint --ext \"**/*.{js,jsx,ts,tsx}\"",
+        "format:check": "prettier --check \"**/*.{js,jsx,ts,tsx}\"",
+        "lint:fix": "eslint --ext \"**/*.{js,jsx,ts,tsx}\" --fix",
+        "format:fix": "prettier --write \"**/*.{js,jsx,ts,tsx}\"",
+        "release": "standard-version",
+        "release:minor": "standard-version --release-as minor",
+        "release:major": "standard-version --release-as major",
+        "release:dry": "standard-version --dry-run"
+    },
+    "keywords": [
+        "node.js",
+        "express.js",
+        "swagger"
+    ],
+    "dependencies": {
+        "async": "^3.2.3",
+        "babel-eslint": "^10.1.0",
+        "bcrypt-nodejs": "0.0.3",
+        "body-parser": "^1.19.0",
+        "cors": "^2.8.5",
+        "crypto": "^1.0.1",
+        "dotenv": "^8.2.0",
+        "express": "^4.17.1",
+        "firebase": "^8.5.0",
+        "firebase-admin": "^10.1.0",
+        "jsonwebtoken": "^8.5.1",
+        "lodash": "^4.17.21",
+        "mongoose": "^6.2.4",
+        "morgan": "^1.10.0",
+        "multer": "^1.4.2",
+        "nodemailer": "^6.7.3",
+        "prettier": "^2.6.2",
+        "standard-version": "^9.3.2",
+        "swagger-ui-express": "^4.3.0"
+    },
+    "devDependencies": {
+        "eslint": "^7.5.0"
+    },
+    "engines": {
+        "node": ">=14.16.0 <=16.13.0",
+        "npm": ">=6.14.11 <=8.1.0"
+    },
+    "author": "@Raed Fadhlaoui <raed.fadhlaoui@hotmail.com>",
+    "description": "Expressn, MongoDB, Firebase and swagger for api documentation",
+    "license": "ISC"
+}

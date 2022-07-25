@@ -1,0 +1,2338 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "version": "1.0.0",
+        "title": "Tnajjem API",
+        "description": "Backend for ATGMO's Tnajjem application documented with Swagger",
+        "license": {
+            "name": "MIT",
+            "url": "https://spdx.org/licenses/MIT.html"
+        },
+        "contact": {
+            "name": "Raed Fadhlaoui",
+            "url": "https://www.linkedin.com/in/fadhlaouiraed/",
+            "email": "raed.fadhlaoui@orange.com"
+        }
+    },
+    "host": "najjem.orange.tn",
+    "basePath": "/v1/api",
+    "tags": [
+        {
+            "name": "Auth",
+            "description": "API for authentification in the system"
+        },
+        {
+            "name": "Account",
+            "description": "API for user account in the system"
+        },
+        {
+            "name": "Users",
+            "description": "API for users in the system"
+        },
+        {
+            "name": "Association",
+            "description": "API for association in the system"
+        },
+        {
+            "name": "Blood Bank",
+            "description": "API for blood bank in the system"
+        },
+        {
+            "name": "Disease",
+            "description": "API for disease in the system"
+        },
+        {
+            "name": "Event/News",
+            "description": "API for article in the system"
+        },
+        {
+            "name": "Help Request",
+            "description": "API for help (blood or material) request in the system"
+        },
+        {
+            "name": "Donnation",
+            "description": "API for donnation in the system"
+        },
+        {
+            "name": "Statistic",
+            "description": "API for statistic in the system"
+        },
+        {
+            "name": "Psychologist",
+            "description": "API for psychologist in the system"
+        },
+        {
+            "name": "Question and Answer",
+            "description": "API for question and answer in the system"
+        }
+    ],
+    "schemes": [
+        "https"
+    ],
+    "consumes": [
+        "application/json"
+    ],
+    "produces": [
+        "application/json"
+    ],
+    "paths": {
+        "/auth/user/check": {
+            "post": {
+                "summary": "Check if we have the email exist in our Database or not",
+                "tags": [
+                    "Auth"
+                ],
+                "description": "Check if we have the email exist in our Database or not",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "body",
+                        "description": "email that we want to verify if we have in our database or not",
+                        "schema": {
+                            "$ref": "#/definitions/email"
+                        }
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success: true"
+                    },
+                    "403": {
+                        "description": "Email existe déjà"
+                    }
+                }
+            }
+        },
+        "/auth/user/signup": {
+            "post": {
+                "summary": "Create new user",
+                "tags": [
+                    "Auth"
+                ],
+                "description": "Create new user",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "body",
+                        "description": "User that we want to create",
+                        "schema": {
+                            "$ref": "#/definitions/newUser"
+                        }
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "New user is created",
+                        "schema": {
+                            "$ref": "#/definitions/User"
+                        }
+                    },
+                    "UnauthorizedError": {
+                        "description": "Authentication information is missing or invalid"
+                    }
+                }
+            }
+        },
+        "/auth/user/login": {
+            "post": {
+                "summary": "Sigin with an existing user",
+                "tags": [
+                    "Auth"
+                ],
+                "description": "Login with an existing user",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "body",
+                        "description": "User that we already have in our databse",
+                        "schema": {
+                            "$ref": "#/definitions/newUser"
+                        }
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK (successfully authenticated)"
+                    },
+                    "UnauthorizedError": {
+                        "description": "Authentication information is missing or invalid"
+                    }
+                }
+            }
+        },
+        "/auth/admin/login": {
+            "post": {
+                "summary": "Sigin with an existing user conatin an Admin/Manager role",
+                "tags": [
+                    "Auth"
+                ],
+                "description": "Login with an existing user and contain an Admin/Manager role",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "body",
+                        "description": "User that we already have in our databse",
+                        "schema": {
+                            "$ref": "#/definitions/newUser"
+                        }
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK (successfully authenticated)"
+                    },
+                    "UnauthorizedError": {
+                        "description": "Authentication information is missing or invalid"
+                    }
+                }
+            }
+        },
+        "/auth/user/password/forget": {
+            "post": {
+                "summary": "Send email to reset password",
+                "tags": [
+                    "Auth"
+                ],
+                "description": "Forget Password to send email",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "body",
+                        "description": "User that we need to reset password",
+                        "schema": {
+                            "$ref": "#/definitions/forgetUserPassword"
+                        }
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK (Email Sent)"
+                    },
+                    "UnauthorizedError": {
+                        "description": "User not found"
+                    }
+                }
+            }
+        },
+        "/auth/user/password/reset/{token}": {
+            "parameters": [
+                {
+                    "name": "token",
+                    "in": "path",
+                    "required": true,
+                    "description": "token of user password that we want to find",
+                    "type": "string"
+                }
+            ],
+            "post": {
+                "summary": "Create new password",
+                "tags": [
+                    "Auth"
+                ],
+                "description": "Reset Password",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "body",
+                        "description": "User that we need to reset password",
+                        "schema": {
+                            "$ref": "#/definitions/resetUserPassword"
+                        }
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK (Password Updated)"
+                    },
+                    "UnauthorizedError": {
+                        "description": "Password reset token is invalid or has expired"
+                    }
+                }
+            }
+        },
+        "/account/{id}/disable": {
+            "parameters": [
+                {
+                    "name": "userId",
+                    "in": "path",
+                    "required": true,
+                    "description": "ID of user that we want to find",
+                    "type": "string"
+                }
+            ],
+            "put": {
+                "summary": "Disable user account with given ID",
+                "tags": [
+                    "Account"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Account Disabled"
+                    }
+                }
+            }
+        },
+        "/account/enable/{token}": {
+            "post": {
+                "summary": "Enable user account with given email and password",
+                "description": "Enable user account",
+                "tags": [
+                    "Account"
+                ],
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "body",
+                        "description": "User that we already have in our databse",
+                        "schema": {
+                            "$ref": "#/definitions/newUser"
+                        }
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK (successfully Activate account)"
+                    },
+                    "UnauthorizedError": {
+                        "description": "Authentication information is missing or invalid"
+                    }
+                }
+            }
+        },
+        "/users": {
+            "get": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Get all users",
+                "responses": {
+                    "200": {
+                        "description": "Return Array of users",
+                        "schema": {
+                            "$ref": "#/definitions/Users"
+                        }
+                    }
+                }
+            }
+        },
+        "/users/{id}": {
+            "parameters": [
+                {
+                    "name": "userId",
+                    "in": "path",
+                    "required": true,
+                    "description": "ID of user that we want to find",
+                    "type": "string"
+                }
+            ],
+            "get": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Get user with given ID",
+                "responses": {
+                    "200": {
+                        "description": "User is found",
+                        "schema": {
+                            "$ref": "#/definitions/User"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "summary": "Update user with give ID",
+                "tags": [
+                    "Users"
+                ],
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "body",
+                        "description": "User with new values of properties",
+                        "schema": {
+                            "$ref": "#/definitions/User"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User is updated",
+                        "schema": {
+                            "$ref": "#/definitions/User"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Delete user with given ID",
+                "tags": [
+                    "Users"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User is deleted"
+                    }
+                }
+            }
+        },
+        "/association": {
+            "post": {
+                "summary": "Create new association",
+                "tags": [
+                    "Association"
+                ],
+                "description": "Create new association",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "body",
+                        "description": "association that we want to create",
+                        "schema": {
+                            "$ref": "#/definitions/newAssociation"
+                        }
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "New association is created",
+                        "schema": {
+                            "$ref": "#/definitions/Association"
+                        }
+                    }
+                }
+            }
+        },
+        "/associations": {
+            "get": {
+                "summary": "Get all associations",
+                "tags": [
+                    "Association"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Return Array of Association",
+                        "schema": {
+                            "$ref": "#/definitions/Association"
+                        }
+                    }
+                }
+            }
+        },
+        "/association/{Id}": {
+            "parameters": [
+                {
+                    "name": "Id",
+                    "in": "path",
+                    "required": true,
+                    "description": "ID of association that we want to find",
+                    "type": "string"
+                }
+            ],
+            "get": {
+                "tags": [
+                    "Association"
+                ],
+                "summary": "Get association with given ID",
+                "responses": {
+                    "200": {
+                        "description": "Association is found",
+                        "schema": {
+                            "$ref": "#/definitions/Association"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "summary": "Update association with give ID",
+                "tags": [
+                    "Association"
+                ],
+                "parameters": [
+                    {
+                        "name": "association",
+                        "in": "body",
+                        "description": "Association with new values of properties",
+                        "schema": {
+                            "$ref": "#/definitions/Association"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Association is updated",
+                        "schema": {
+                            "$ref": "#/definitions/Association"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Delete association with given ID",
+                "tags": [
+                    "Association"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Association is deleted"
+                    }
+                }
+            }
+        },
+        "/bloodBank": {
+            "post": {
+                "summary": "Create new blood bank",
+                "tags": [
+                    "Blood Bank"
+                ],
+                "description": "Create new Blood Bank",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "body",
+                        "description": "Blood Bank that we want to create",
+                        "schema": {
+                            "$ref": "#/definitions/newBloodBank"
+                        }
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "New Blood Bank is created",
+                        "schema": {
+                            "$ref": "#/definitions/BloodBank"
+                        }
+                    }
+                }
+            }
+        },
+        "/bloodBanks": {
+            "get": {
+                "tags": [
+                    "Blood Bank"
+                ],
+                "summary": "Get all bloodBanks",
+                "responses": {
+                    "200": {
+                        "description": "Return Array of Blood Bank",
+                        "schema": {
+                            "$ref": "#/definitions/BloodBank"
+                        }
+                    }
+                }
+            }
+        },
+        "/bloodBank/{Id}": {
+            "parameters": [
+                {
+                    "name": "Id",
+                    "in": "path",
+                    "required": true,
+                    "description": "ID of bloodBank that we want to find",
+                    "type": "string"
+                }
+            ],
+            "get": {
+                "tags": [
+                    "Blood Bank"
+                ],
+                "summary": "Get bloodBank with given ID",
+                "responses": {
+                    "200": {
+                        "description": "bloodBanks is found",
+                        "schema": {
+                            "$ref": "#/definitions/BloodBank"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "summary": "Update bloodBank with give ID",
+                "tags": [
+                    "Blood Bank"
+                ],
+                "parameters": [
+                    {
+                        "name": "bloodBank",
+                        "in": "body",
+                        "description": "bloodBanks with new values of properties",
+                        "schema": {
+                            "$ref": "#/definitions/BloodBank"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "BloodBank is updated",
+                        "schema": {
+                            "$ref": "#/definitions/BloodBank"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Delete BloodBank with given ID",
+                "tags": [
+                    "Blood Bank"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "BloodBank is deleted"
+                    }
+                }
+            }
+        },
+        "/disease": {
+            "post": {
+                "summary": "Create new disease",
+                "tags": [
+                    "Disease"
+                ],
+                "description": "Create new Disease",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "body",
+                        "description": "Disease that we want to create",
+                        "schema": {
+                            "$ref": "#/definitions/newDisease"
+                        }
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "New Disease is created",
+                        "schema": {
+                            "$ref": "#/definitions/Disease"
+                        }
+                    }
+                }
+            }
+        },
+        "/diseases": {
+            "get": {
+                "tags": [
+                    "Disease"
+                ],
+                "summary": "Get all Disease",
+                "responses": {
+                    "200": {
+                        "description": "Return Array of Disease",
+                        "schema": {
+                            "$ref": "#/definitions/Disease"
+                        }
+                    }
+                }
+            }
+        },
+        "/disease/{Id}": {
+            "parameters": [
+                {
+                    "name": "Id",
+                    "in": "path",
+                    "required": true,
+                    "description": "ID of Disease that we want to find",
+                    "type": "string"
+                }
+            ],
+            "get": {
+                "tags": [
+                    "Disease"
+                ],
+                "summary": "Get Disease with given ID",
+                "responses": {
+                    "200": {
+                        "description": "Disease is found",
+                        "schema": {
+                            "$ref": "#/definitions/Disease"
+                        }
+                    },
+                    "403": {
+                        "description": "Disease not found"
+                    }
+                }
+            },
+            "put": {
+                "summary": "Update Disease with give ID",
+                "tags": [
+                    "Disease"
+                ],
+                "parameters": [
+                    {
+                        "name": "Disease",
+                        "in": "body",
+                        "description": "Disease with new values of properties",
+                        "schema": {
+                            "$ref": "#/definitions/Disease"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Disease is updated",
+                        "schema": {
+                            "$ref": "#/definitions/Disease"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Delete Disease with given ID",
+                "tags": [
+                    "Disease"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Disease is deleted"
+                    }
+                }
+            }
+        },
+        "/event": {
+            "post": {
+                "summary": "Create new event",
+                "tags": [
+                    "Event/News"
+                ],
+                "description": "Create new Event",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "body",
+                        "description": "Event that we want to create",
+                        "schema": {
+                            "$ref": "#/definitions/newEvent"
+                        }
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "New Event is created",
+                        "schema": {
+                            "$ref": "#/definitions/Event"
+                        }
+                    }
+                }
+            }
+        },
+        "/events": {
+            "get": {
+                "tags": [
+                    "Event/News"
+                ],
+                "summary": "Get all Events",
+                "responses": {
+                    "200": {
+                        "description": "Return Array of Events",
+                        "schema": {
+                            "$ref": "#/definitions/Event"
+                        }
+                    }
+                }
+            }
+        },
+        "/event/{Id}": {
+            "parameters": [
+                {
+                    "name": "Id",
+                    "in": "path",
+                    "required": true,
+                    "description": "ID of article that we want to find",
+                    "type": "string"
+                }
+            ],
+            "get": {
+                "tags": [
+                    "Event/News"
+                ],
+                "summary": "Get Event with given ID",
+                "responses": {
+                    "200": {
+                        "description": "Event is found",
+                        "schema": {
+                            "$ref": "#/definitions/Event"
+                        }
+                    },
+                    "403": {
+                        "description": "Event not found"
+                    }
+                }
+            },
+            "put": {
+                "summary": "Update Event with give ID",
+                "tags": [
+                    "Event/News"
+                ],
+                "parameters": [
+                    {
+                        "name": "Event",
+                        "in": "body",
+                        "description": "Event with new values of properties",
+                        "schema": {
+                            "$ref": "#/definitions/Event"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Event is updated",
+                        "schema": {
+                            "$ref": "#/definitions/Event"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Delete Event with given ID",
+                "tags": [
+                    "Event/News"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Event is deleted"
+                    }
+                }
+            }
+        },
+        "/helpRequest": {
+            "post": {
+                "summary": "Create new help request (blood or material)",
+                "tags": [
+                    "Help Request"
+                ],
+                "description": "Create new HelpRequest",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "body",
+                        "description": "HelpRequest that we want to create",
+                        "schema": {
+                            "$ref": "#/definitions/newHelpRequest"
+                        }
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "New HelpRequest is created",
+                        "schema": {
+                            "$ref": "#/definitions/HelpRequest"
+                        }
+                    }
+                }
+            }
+        },
+        "/helpRequests": {
+            "get": {
+                "tags": [
+                    "Help Request"
+                ],
+                "summary": "Get all HelpRequest",
+                "responses": {
+                    "200": {
+                        "description": "Return Array of HR and statistique: (totalBloodRequest, totalMaterialRequest, totalBloodRequestDonners, totalMaterialRequestDonners)",
+                        "schema": {
+                            "$ref": "#/definitions/HelpRequest"
+                        }
+                    }
+                }
+            }
+        },
+        "/helpRequestsByUser": {
+            "get": {
+                "tags": [
+                    "Help Request"
+                ],
+                "summary": "Get all HelpRequest and the status for each",
+                "responses": {
+                    "200": {
+                        "description": "Return Array of HR and statistique: (totalBloodRequest, totalMaterialRequest, totalBloodRequestDonners, totalMaterialRequestDonners)",
+                        "schema": {
+                            "$ref": "#/definitions/HelpRequest"
+                        }
+                    }
+                }
+            }
+        },
+        "/bloodHelpRequests": {
+            "get": {
+                "tags": [
+                    "Help Request"
+                ],
+                "summary": "Get all Blood Help Request",
+                "responses": {
+                    "200": {
+                        "description": "Return Array of blood HR",
+                        "schema": {
+                            "$ref": "#/definitions/HelpRequest"
+                        }
+                    }
+                }
+            }
+        },
+        "/bloodHelpRequestsByUser": {
+            "parameters": [
+                {
+                    "name": "Token",
+                    "in": "path",
+                    "required": true,
+                    "description": "User Token",
+                    "type": "string"
+                }
+            ],
+            "get": {
+                "tags": [
+                    "Help Request"
+                ],
+                "summary": "Get all Blood Help Request by user with donnation status",
+                "responses": {
+                    "200": {
+                        "description": "Return Array of blood HR with their status",
+                        "schema": {
+                            "$ref": "#/definitions/HelpRequest"
+                        }
+                    }
+                }
+            }
+        },
+        "/materialHelpRequests": {
+            "get": {
+                "tags": [
+                    "Help Request"
+                ],
+                "summary": "Get all Material Help Request",
+                "responses": {
+                    "200": {
+                        "description": "Return Array of Material HR",
+                        "schema": {
+                            "$ref": "#/definitions/HelpRequest"
+                        }
+                    }
+                }
+            }
+        },
+        "/materialHelpRequestsByUser": {
+            "parameters": [
+                {
+                    "name": "Token",
+                    "in": "path",
+                    "required": true,
+                    "description": "User Token",
+                    "type": "string"
+                }
+            ],
+            "get": {
+                "tags": [
+                    "Help Request"
+                ],
+                "summary": "Get all Material Help Request by user with donnation status",
+                "responses": {
+                    "200": {
+                        "description": "Return Array of material HR with their status",
+                        "schema": {
+                            "$ref": "#/definitions/HelpRequest"
+                        }
+                    }
+                }
+            }
+        },
+        "/helpRequest/{Id}": {
+            "parameters": [
+                {
+                    "name": "Id",
+                    "in": "path",
+                    "required": true,
+                    "description": "ID of help request that we want to find",
+                    "type": "string"
+                }
+            ],
+            "get": {
+                "tags": [
+                    "Help Request"
+                ],
+                "summary": "Get Help Request with given ID",
+                "responses": {
+                    "200": {
+                        "description": "HelpRequest is found",
+                        "schema": {
+                            "$ref": "#/definitions/HelpRequest"
+                        }
+                    },
+                    "403": {
+                        "description": "HelpRequest not found"
+                    }
+                }
+            },
+            "put": {
+                "summary": "Update HelpRequest with give ID",
+                "tags": [
+                    "Help Request"
+                ],
+                "parameters": [
+                    {
+                        "name": "HelpRequest",
+                        "in": "body",
+                        "description": "HelpRequest with new values of properties",
+                        "schema": {
+                            "$ref": "#/definitions/HelpRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "HelpRequest is updated",
+                        "schema": {
+                            "$ref": "#/definitions/HelpRequest"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Delete HelpRequest with given ID",
+                "tags": [
+                    "Help Request"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "HelpRequest is deleted"
+                    }
+                }
+            }
+        },
+        "/donnations": {
+            "get": {
+                "tags": [
+                    "Donnation"
+                ],
+                "summary": "Get all Donnation",
+                "responses": {
+                    "200": {
+                        "description": "Return Array of Donnation",
+                        "schema": {
+                            "$ref": "#/definitions/Donnations"
+                        }
+                    }
+                }
+            }
+        },
+        "/donnation/{Id}": {
+            "parameters": [
+                {
+                    "name": "Id",
+                    "in": "path",
+                    "required": true,
+                    "description": "ID of donnation that we want to find",
+                    "type": "string"
+                }
+            ],
+            "get": {
+                "tags": [
+                    "Donnation"
+                ],
+                "summary": "Get Donnation with given ID",
+                "responses": {
+                    "200": {
+                        "description": "Donnation is found",
+                        "schema": {
+                            "$ref": "#/definitions/Donnation"
+                        }
+                    },
+                    "403": {
+                        "description": "Donnation not found"
+                    }
+                }
+            }
+        },
+        "/donnation/{Id}/interact": {
+            "parameters": [
+                {
+                    "name": "Id",
+                    "in": "path",
+                    "required": true,
+                    "description": "ID of donnation that we want to interact with",
+                    "type": "string"
+                }
+            ],
+            "post": {
+                "tags": [
+                    "Donnation"
+                ],
+                "summary": "Interact with help request",
+                "responses": {
+                    "200": {
+                        "description": "Your request is pending",
+                        "schema": {
+                            "$ref": "#/definitions/Donnation"
+                        }
+                    }
+                }
+            }
+        },
+        "/donnation/{Id}/action": {
+            "parameters": [
+                {
+                    "name": "Id",
+                    "in": "path",
+                    "required": true,
+                    "description": "ID of donnation that we want to make action with",
+                    "type": "string"
+                }
+            ],
+            "put": {
+                "tags": [
+                    "Donnation"
+                ],
+                "summary": "As an admin I can accept or decline user interaction",
+                "responses": {
+                    "200": {
+                        "description": "Your request is pending",
+                        "schema": {
+                            "$ref": "#/definitions/Donnation"
+                        }
+                    }
+                }
+            }
+        },
+        "/history/blood-donnations": {
+            "get": {
+                "tags": [
+                    "Donnation"
+                ],
+                "summary": "Get current user blood donnation history",
+                "responses": {
+                    "200": {
+                        "description": "Blood Donnation is found",
+                        "schema": {
+                            "$ref": "#/definitions/Donnation"
+                        }
+                    }
+                }
+            }
+        },
+        "/history/material-donnations": {
+            "get": {
+                "tags": [
+                    "Donnation"
+                ],
+                "summary": "Get current user material donnation history",
+                "responses": {
+                    "200": {
+                        "description": "Material Donnation is found",
+                        "schema": {
+                            "$ref": "#/definitions/Donnation"
+                        }
+                    }
+                }
+            }
+        },
+        "/statistic": {
+            "get": {
+                "tags": [
+                    "Statistic"
+                ],
+                "summary": "Get all Statistic",
+                "responses": {
+                    "200": {
+                        "description": "Return statistic for total Users Interacted and total Donnation Accepted"
+                    }
+                }
+            }
+        },
+        "/psychologist": {
+            "post": {
+                "summary": "Create new psychologist",
+                "tags": [
+                    "Psychologist"
+                ],
+                "description": "Create new  Psychologist",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "body",
+                        "description": " Psychologist that we want to create",
+                        "schema": {
+                            "$ref": "#/definitions/newPsychologist"
+                        }
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "New  Psychologist is created",
+                        "schema": {
+                            "$ref": "#/definitions/Psychologist"
+                        }
+                    }
+                }
+            }
+        },
+        "/psychologists": {
+            "get": {
+                "tags": [
+                    "Psychologist"
+                ],
+                "summary": "Get all psychologists",
+                "responses": {
+                    "200": {
+                        "description": "Return Array of psychologists",
+                        "schema": {
+                            "$ref": "#/definitions/Psychologist"
+                        }
+                    }
+                }
+            }
+        },
+        "/psychologist/{Id}": {
+            "parameters": [
+                {
+                    "name": "Id",
+                    "in": "path",
+                    "required": true,
+                    "description": "ID of psychologist that we want to find",
+                    "type": "string"
+                }
+            ],
+            "get": {
+                "tags": [
+                    "Psychologist"
+                ],
+                "summary": "Get Psychologist with given ID",
+                "responses": {
+                    "200": {
+                        "description": "Psychologist is found",
+                        "schema": {
+                            "$ref": "#/definitions/Psychologist"
+                        }
+                    },
+                    "403": {
+                        "description": "Psychologist not found"
+                    }
+                }
+            },
+            "put": {
+                "summary": "Update Psychologist with give ID",
+                "tags": [
+                    "Psychologist"
+                ],
+                "parameters": [
+                    {
+                        "name": "Psychologist",
+                        "in": "body",
+                        "description": "Psychologist with new values of properties",
+                        "schema": {
+                            "$ref": "#/definitions/Psychologist"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Psychologist is updated",
+                        "schema": {
+                            "$ref": "#/definitions/Psychologist"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Delete Psychologist with given ID",
+                "tags": [
+                    "Psychologist"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Psychologist is deleted"
+                    }
+                }
+            }
+        },
+        "/questionAndAnswer": {
+            "post": {
+                "summary": "Create new question and answer",
+                "tags": [
+                    "Question and Answer"
+                ],
+                "description": "Create new  QuestionAndAnswers",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "body",
+                        "description": " QuestionAndAnswers that we want to create",
+                        "schema": {
+                            "$ref": "#/definitions/newQuestionAndAnswer"
+                        }
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "New  QuestionAndAnswers is created",
+                        "schema": {
+                            "$ref": "#/definitions/QuestionAndAnswer"
+                        }
+                    }
+                }
+            }
+        },
+        "/questionAndAnswers": {
+            "get": {
+                "tags": [
+                    "Question and Answer"
+                ],
+                "summary": "Get all QuestionAndAnswers",
+                "responses": {
+                    "200": {
+                        "description": "Return Array of QuestionAndAnswers",
+                        "schema": {
+                            "$ref": "#/definitions/QuestionAndAnswer"
+                        }
+                    }
+                }
+            }
+        },
+        "/questionAndAnswer/{Id}": {
+            "parameters": [
+                {
+                    "name": "Id",
+                    "in": "path",
+                    "required": true,
+                    "description": "ID of QuestionAndAnswer that we want to find",
+                    "type": "string"
+                }
+            ],
+            "get": {
+                "tags": [
+                    "Question and Answer"
+                ],
+                "summary": "Get QuestionAndAnswer with given ID",
+                "responses": {
+                    "200": {
+                        "description": "QuestionAndAnswer is found",
+                        "schema": {
+                            "$ref": "#/definitions/QuestionAndAnswer"
+                        }
+                    },
+                    "403": {
+                        "description": "QuestionAndAnswer not found"
+                    }
+                }
+            },
+            "put": {
+                "summary": "Update QuestionAndAnswer with give ID",
+                "tags": [
+                    "Question and Answer"
+                ],
+                "parameters": [
+                    {
+                        "name": "Question and Answer",
+                        "in": "body",
+                        "description": "QuestionAndAnswer with new values of properties",
+                        "schema": {
+                            "$ref": "#/definitions/QuestionAndAnswer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "QuestionAndAnswer is updated",
+                        "schema": {
+                            "$ref": "#/definitions/QuestionAndAnswer"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Delete QuestionAndAnswer with given ID",
+                "tags": [
+                    "Question and Answer"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "QuestionAndAnswer is deleted"
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "email": {
+            "required": [
+                "email"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string",
+                    "uniqueItems": true
+                }
+            }
+        },
+        "newUser": {
+            "required": [
+                "email",
+                "password"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string",
+                    "uniqueItems": true
+                },
+                "password": {
+                    "type": "string",
+                    "format": "password"
+                }
+            }
+        },
+        "forgetUserPassword": {
+            "required": [
+                "email"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string",
+                    "uniqueItems": true
+                }
+            }
+        },
+        "resetUserPassword": {
+            "required": [
+                "resetPasswordToken",
+                "resetPasswordExpires"
+            ],
+            "properties": {
+                "resetPasswordToken": {
+                    "type": "string",
+                    "format": "password"
+                },
+                "resetPasswordExpires": {
+                    "type": "string",
+                    "format": "password"
+                }
+            }
+        },
+        "User": {
+            "required": [
+                "email",
+                "password"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string",
+                    "uniqueItems": true
+                },
+                "password": {
+                    "type": "string",
+                    "format": "password"
+                },
+                "fullName": {
+                    "type": "string"
+                },
+                "photo": {
+                    "type": "string"
+                },
+                "canHelpWith": {
+                    "type": "string"
+                },
+                "governorate": {
+                    "type": "string"
+                },
+                "municipality": {
+                    "type": "string"
+                },
+                "age": {
+                    "type": "Number"
+                },
+                "gender": {
+                    "type": "string"
+                },
+                "dateOfBirth": {
+                    "type": "string"
+                },
+                "phoneNumber": {
+                    "type": "string"
+                },
+                "whatsappNumber": {
+                    "type": "string"
+                },
+                "bloodType": {
+                    "type": "string"
+                },
+                "bloodHelpCount": {
+                    "type": "Number"
+                },
+                "materialHelpCount": {
+                    "type": "Number"
+                },
+                "is_volunteer": {
+                    "type": "boolean"
+                },
+                "is_doner": {
+                    "type": "boolean"
+                },
+                "is_active": {
+                    "type": "boolean"
+                },
+                "is_anonymous": {
+                    "type": "boolean"
+                },
+                "is_admin": {
+                    "type": "boolean"
+                },
+                "is_manager": {
+                    "type": "boolean"
+                },
+                "last_donation": {
+                    "type": "number",
+                    "format": "string"
+                }
+            }
+        },
+        "Users": {
+            "type": "array",
+            "$ref": "#/definitions/User"
+        },
+        "newAssociation": {
+            "properties": {
+                "gallery": {
+                    "type": "array",
+                    "items": {}
+                },
+                "photo": {
+                    "type": "string"
+                },
+                "email_contact": {
+                    "type": "string"
+                },
+                "phone_contact": {
+                    "type": "string"
+                },
+                "fax_contact": {
+                    "type": "string"
+                },
+                "title_ar": {
+                    "type": "string"
+                },
+                "description_ar": {
+                    "type": "string"
+                },
+                "address_contact_ar": {
+                    "type": "string"
+                },
+                "location_ar": {
+                    "type": "string"
+                },
+                "presidentOfAssociation_ar": {
+                    "type": "string"
+                },
+                "ambassador_ar": {
+                    "type": "string"
+                },
+                "creation_ar": {
+                    "type": "string"
+                },
+                "value_ar": {
+                    "type": "string"
+                },
+                "mission_ar": {
+                    "type": "string"
+                },
+                "legalStatus_ar": {
+                    "type": "string"
+                },
+                "title_fr": {
+                    "type": "string"
+                },
+                "description_fr": {
+                    "type": "string"
+                },
+                "address_contact_fr": {
+                    "type": "string"
+                },
+                "location_fr": {
+                    "type": "string"
+                },
+                "presidentOfAssociation_fr": {
+                    "type": "string"
+                },
+                "ambassador_fr": {
+                    "type": "string"
+                },
+                "creation_fr": {
+                    "type": "string"
+                },
+                "value_fr": {
+                    "type": "string"
+                },
+                "mission_fr": {
+                    "type": "string"
+                },
+                "legalStatus_fr": {
+                    "type": "string"
+                },
+                "coordinates": {
+                    "type": "object",
+                    "properties": {
+                        "latitude": {
+                            "type": "string"
+                        },
+                        "longitude": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "Association": {
+            "properties": {
+                "gallery": {
+                    "type": "array",
+                    "items": {}
+                },
+                "photo": {
+                    "type": "string"
+                },
+                "email_contact": {
+                    "type": "string"
+                },
+                "phone_contact": {
+                    "type": "string"
+                },
+                "fax_contact": {
+                    "type": "string"
+                },
+                "ar": {
+                    "type": "object",
+                    "properties": {
+                        "title": {
+                            "type": "string"
+                        },
+                        "description": {
+                            "type": "string"
+                        },
+                        "address_contact": {
+                            "type": "string"
+                        },
+                        "location": {
+                            "type": "string"
+                        },
+                        "presidentOfAssociation": {
+                            "type": "string"
+                        },
+                        "ambassador": {
+                            "type": "string"
+                        },
+                        "creation": {
+                            "type": "string"
+                        },
+                        "value": {
+                            "type": "string"
+                        },
+                        "mission": {
+                            "type": "string"
+                        },
+                        "legalStatus": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "fr": {
+                    "type": "object",
+                    "properties": {
+                        "title": {
+                            "type": "string"
+                        },
+                        "description": {
+                            "type": "string"
+                        },
+                        "address_contact": {
+                            "type": "string"
+                        },
+                        "location": {
+                            "type": "string"
+                        },
+                        "presidentOfAssociation": {
+                            "type": "string"
+                        },
+                        "ambassador": {
+                            "type": "string"
+                        },
+                        "creation": {
+                            "type": "string"
+                        },
+                        "value": {
+                            "type": "string"
+                        },
+                        "mission": {
+                            "type": "string"
+                        },
+                        "legalStatus": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "coordinates": {
+                    "type": "object",
+                    "properties": {
+                        "latitude": {
+                            "type": "string"
+                        },
+                        "longitude": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "newBloodBank": {
+            "properties": {
+                "title_ar": {
+                    "type": "string"
+                },
+                "description_ar": {
+                    "type": "string"
+                },
+                "address_ar": {
+                    "type": "string"
+                },
+                "title_fr": {
+                    "type": "string"
+                },
+                "description_fr": {
+                    "type": "string"
+                },
+                "address_fr": {
+                    "type": "string"
+                },
+                "coordinates": {
+                    "type": "object",
+                    "properties": {
+                        "latitude": {
+                            "type": "string"
+                        },
+                        "longitude": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "website": {
+                    "type": "string"
+                },
+                "phoneNumber": {
+                    "type": "string"
+                },
+                "faxNumber": {
+                    "type": "string"
+                }
+            }
+        },
+        "BloodBank": {
+            "properties": {
+                "ar": {
+                    "type": "object",
+                    "properties": {
+                        "title": {
+                            "type": "string"
+                        },
+                        "description": {
+                            "type": "string"
+                        },
+                        "address": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "fr": {
+                    "type": "object",
+                    "properties": {
+                        "title": {
+                            "type": "string"
+                        },
+                        "description": {
+                            "type": "string"
+                        },
+                        "address": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "coordinates": {
+                    "type": "object",
+                    "properties": {
+                        "latitude": {
+                            "type": "string"
+                        },
+                        "longitude": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "website": {
+                    "type": "string"
+                },
+                "phoneNumber": {
+                    "type": "string"
+                },
+                "faxNumber": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "newDisease": {
+            "properties": {
+                "title_ar": {
+                    "type": "string"
+                },
+                "description_ar": {
+                    "type": "string"
+                },
+                "title_fr": {
+                    "type": "string"
+                },
+                "description_fr": {
+                    "type": "string"
+                },
+                "photo": {
+                    "type": "string"
+                }
+            }
+        },
+        "Disease": {
+            "properties": {
+                "ar": {
+                    "type": "object",
+                    "properties": {
+                        "title": {
+                            "type": "string"
+                        },
+                        "description": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "fr": {
+                    "type": "object",
+                    "properties": {
+                        "title": {
+                            "type": "string"
+                        },
+                        "description": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "photo": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "newEvent": {
+            "properties": {
+                "gallery": {
+                    "type": "array",
+                    "items": {}
+                },
+                "photo": {
+                    "type": "string"
+                },
+                "start_at": {
+                    "type": "string"
+                },
+                "end_at": {
+                    "type": "string"
+                },
+                "link": {
+                    "type": "string"
+                },
+                "isEvent": {
+                    "type": "boolean"
+                },
+                "event_name_ar": {
+                    "type": "string"
+                },
+                "description_ar": {
+                    "type": "string"
+                },
+                "event_location_ar": {
+                    "type": "string"
+                },
+                "event_name_fr": {
+                    "type": "string"
+                },
+                "description_fr": {
+                    "type": "string"
+                },
+                "event_location_fr": {
+                    "type": "string"
+                },
+                "coordinates": {
+                    "type": "object",
+                    "properties": {
+                        "latitude": {
+                            "type": "string"
+                        },
+                        "longitude": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "Event": {
+            "properties": {
+                "gallery": {
+                    "type": "array",
+                    "items": {}
+                },
+                "photo": {
+                    "type": "string"
+                },
+                "start_at": {
+                    "type": "string"
+                },
+                "end_at": {
+                    "type": "string"
+                },
+                "link": {
+                    "type": "string"
+                },
+                "isEvent": {
+                    "type": "boolean"
+                },
+                "ar": {
+                    "type": "object",
+                    "properties": {
+                        "event_name": {
+                            "type": "string"
+                        },
+                        "description": {
+                            "type": "string"
+                        },
+                        "event_location": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "fr": {
+                    "type": "object",
+                    "properties": {
+                        "event_name": {
+                            "type": "string"
+                        },
+                        "description": {
+                            "type": "string"
+                        },
+                        "event_location": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "coordinates": {
+                    "type": "object",
+                    "properties": {
+                        "latitude": {
+                            "type": "string"
+                        },
+                        "longitude": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "newHelpRequest": {
+            "properties": {
+                "gallery": {
+                    "type": "array",
+                    "items": {}
+                },
+                "title_ar": {
+                    "type": "string"
+                },
+                "description_ar": {
+                    "type": "string"
+                },
+                "gouvernorat_ar": {
+                    "type": "string"
+                },
+                "municipalitie_ar": {
+                    "type": "string"
+                },
+                "address_ar": {
+                    "type": "string"
+                },
+                "status_ar": {
+                    "type": "string"
+                },
+                "sector_ar": {
+                    "type": "string"
+                },
+                "service_ar": {
+                    "type": "string"
+                },
+                "title_fr": {
+                    "type": "string"
+                },
+                "description_fr": {
+                    "type": "string"
+                },
+                "gouvernorat_fr": {
+                    "type": "string"
+                },
+                "municipalitie_fr": {
+                    "type": "string"
+                },
+                "address_fr": {
+                    "type": "string"
+                },
+                "status_fr": {
+                    "type": "string"
+                },
+                "sector_fr": {
+                    "type": "string"
+                },
+                "service_fr": {
+                    "type": "string"
+                },
+                "coordinates": {
+                    "type": "object",
+                    "properties": {
+                        "latitude": {
+                            "type": "string"
+                        },
+                        "longitude": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "isArchived": {
+                    "type": "boolean"
+                },
+                "isBloodRequest": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "HelpRequest": {
+            "properties": {
+                "gallery": {
+                    "type": "array",
+                    "items": {}
+                },
+                "ar": {
+                    "type": "object",
+                    "properties": {
+                        "title": {
+                            "type": "string"
+                        },
+                        "description": {
+                            "type": "string"
+                        },
+                        "gouvernorat": {
+                            "type": "string"
+                        },
+                        "municipalitie": {
+                            "type": "string"
+                        },
+                        "address": {
+                            "type": "string"
+                        },
+                        "status": {
+                            "type": "string"
+                        },
+                        "sector": {
+                            "type": "string"
+                        },
+                        "service": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "fr": {
+                    "type": "object",
+                    "properties": {
+                        "title": {
+                            "type": "string"
+                        },
+                        "description": {
+                            "type": "string"
+                        },
+                        "gouvernorat": {
+                            "type": "string"
+                        },
+                        "municipalitie": {
+                            "type": "string"
+                        },
+                        "address": {
+                            "type": "string"
+                        },
+                        "status": {
+                            "type": "string"
+                        },
+                        "sector": {
+                            "type": "string"
+                        },
+                        "service": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "coordinates": {
+                    "type": "object",
+                    "properties": {
+                        "latitude": {
+                            "type": "string"
+                        },
+                        "longitude": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "isArchived": {
+                    "type": "boolean"
+                },
+                "isBloodRequest": {
+                    "type": "boolean"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "Donnation": {
+            "properties": {
+                "donner": {
+                    "type": "object"
+                },
+                "helpRequest": {
+                    "type": "object"
+                },
+                "requestStatus": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "newPsychologist": {
+            "properties": {
+                "fullName_ar": {
+                    "type": "string"
+                },
+                "speciality_ar": {
+                    "type": "string"
+                },
+                "address_ar": {
+                    "type": "string"
+                },
+                "fullName_fr": {
+                    "type": "string"
+                },
+                "speciality_fr": {
+                    "type": "string"
+                },
+                "address_fr": {
+                    "type": "string"
+                },
+                "coordinates": {
+                    "type": "object",
+                    "properties": {
+                        "latitude": {
+                            "type": "string"
+                        },
+                        "longitude": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "email": {
+                    "type": "string"
+                },
+                "link": {
+                    "type": "string"
+                },
+                "phoneNumber": {
+                    "type": "string"
+                },
+                "faxNumber": {
+                    "type": "string"
+                }
+            }
+        },
+        "Psychologist": {
+            "properties": {
+                "ar": {
+                    "type": "object",
+                    "properties": {
+                        "fullName": {
+                            "type": "string"
+                        },
+                        "speciality": {
+                            "type": "string"
+                        },
+                        "address": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "fr": {
+                    "type": "object",
+                    "properties": {
+                        "fullName": {
+                            "type": "string"
+                        },
+                        "speciality": {
+                            "type": "string"
+                        },
+                        "address": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "coordinates": {
+                    "type": "object",
+                    "properties": {
+                        "latitude": {
+                            "type": "string"
+                        },
+                        "longitude": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "email": {
+                    "type": "string"
+                },
+                "link": {
+                    "type": "string"
+                },
+                "phoneNumber": {
+                    "type": "string"
+                },
+                "faxNumber": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "newQuestionAndAnswer": {
+            "properties": {
+                "question_ar": {
+                    "type": "string"
+                },
+                "answer_ar": {
+                    "type": "string"
+                },
+                "question_fr": {
+                    "type": "string"
+                },
+                "answer_fr": {
+                    "type": "string"
+                },
+                "link": {
+                    "type": "string"
+                }
+            }
+        },
+        "QuestionAndAnswer": {
+            "properties": {
+                "ar": {
+                    "type": "object",
+                    "properties": {
+                        "question": {
+                            "type": "string"
+                        },
+                        "answer": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "fr": {
+                    "type": "object",
+                    "properties": {
+                        "question": {
+                            "type": "string"
+                        },
+                        "answer": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "link": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}
