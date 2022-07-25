@@ -45,15 +45,20 @@ router.post('/account/:token/enable', authController.enableAccount);
 /* -------------------------------------------------------------------------- */
 
 // GET request - Get current user
-router.get('/user', verifyToken, authController.getCurrentUser);
+router.get('/users/me', verifyToken, authController.getCurrentUser);
 
 // PUT request - Update user by id
-router.put('/user/:id', verifyToken, fileUpload, authController.updateUserById);
+router.put(
+  '/users/:id',
+  verifyToken,
+  fileUpload,
+  authController.updateUserById,
+);
 
 // GET request - Get all users
 router.get('/users', verifyToken, authController.getAllUsers);
 
 // DELETE request - delete user
-router.delete('/user/:id', verifyToken, authController.deleteUser);
+router.delete('/users/:id', verifyToken, authController.deleteUser);
 
 module.exports = router;

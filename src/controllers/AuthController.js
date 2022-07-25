@@ -114,8 +114,7 @@ const signUp = async (req, res) => {
       var data = {
         from: FROM_EMAIL,
         to: newUser.email,
-        subject:
-          'Confirmation de votre enregistrement sur l’application',
+        subject: 'Confirmation de votre enregistrement sur l’application',
         html: template,
       };
       // send email
@@ -257,8 +256,7 @@ const forgotPassword = function (req, res) {
         var data = {
           from: FROM_EMAIL,
           to: user.email,
-          subject:
-            'Reinitialisation de votre mot de passe',
+          subject: 'Reinitialisation de votre mot de passe',
           html: template,
         };
         // send email
@@ -307,8 +305,7 @@ const resetPassword = function (req, res) {
           var data = {
             to: user.email,
             from: FROM_EMAIL,
-            subject:
-              'Confirmation de réinitialisation du mot de passe',
+            subject: 'Confirmation de réinitialisation du mot de passe',
             html: template,
           };
 

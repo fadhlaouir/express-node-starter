@@ -22,12 +22,12 @@ router.post('/event', fileUpload, verifyToken, eventController.createEvent);
 router.get('/events', eventController.getAllEvents);
 
 // GET request - get a single event
-router.get('/event/:id', eventController.getEventById);
+router.get('/events/:id', eventController.getEventById);
 
 // PUT request - Update a single event
-router.put('/event/:id', fileUpload, verifyToken, eventController.updateEvent);
+router.put('/events/:id', fileUpload, verifyToken, eventController.updateEvent);
 
 // DELETE request - delete a single event
-router.delete('/event/:id', verifyToken, eventController.deleteEvent);
+router.delete('/events/:id', verifyToken, eventController.deleteEvent);
 
 module.exports = router;
