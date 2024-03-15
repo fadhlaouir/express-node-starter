@@ -57,12 +57,12 @@ async function generateEmptyCrud(entity) {
   await fs.mkdir(`src/controllers/${entity}`, { recursive: true });
   await fs.mkdir(`src/routes/${entity}`, { recursive: true });
 
-  await fs.writeFile(`src/models/${entity}/${entity}.model.js`, modelTemplate);
+  await fs.writeFile(`src/models/${entity}.model.js`, modelTemplate);
   await fs.writeFile(
-    `src/controllers/${entity}/${entity}.controller.js`,
+    `src/controllers/${entity}.controller.js`,
     controllerTemplate,
   );
-  await fs.writeFile(`src/routes/${entity}/${entity}.route.js`, routeTemplate);
+  await fs.writeFile(`src/routes/${entity}.route.js`, routeTemplate);
 }
 
 /**
@@ -201,12 +201,12 @@ async function generateMinimalCrud(entity) {
   await fs.mkdir(`src/controllers/${entity}`, { recursive: true });
   await fs.mkdir(`src/routes/${entity}`, { recursive: true });
 
-  await fs.writeFile(`src/models/${entity}/${entity}.model.js`, modelTemplate);
+  await fs.writeFile(`src/models/${entity}.model.js`, modelTemplate);
   await fs.writeFile(
-    `src/controllers/${entity}/${entity}.controller.js`,
+    `src/controllers/${entity}.controller.js`,
     controllerTemplate,
   );
-  await fs.writeFile(`src/routes/${entity}/${entity}.route.js`, routeTemplate);
+  await fs.writeFile(`src/routes/${entity}.route.js`, routeTemplate);
 }
 
 module.exports = {
