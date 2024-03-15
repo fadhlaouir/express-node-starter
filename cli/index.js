@@ -1,7 +1,24 @@
-const { generateEmptyCrud } = require('./generateEmptyCrud');
-const { generateMinimalCrud } = require('./generateMinimalCrud');
+/* -------------------------------------------------------------------------- */
+/*                                DEPENDENCIES                                */
+/* -------------------------------------------------------------------------- */
+// packages
 const inquirer = require('inquirer');
 
+// local helpers and functions
+const { generateEmptyCrud } = require('./generateEmptyCrud');
+const { generateMinimalCrud } = require('./generateMinimalCrud');
+const { isEntityExists } = require('./helpers');
+
+/* -------------------------------------------------------------------------- */
+/*                                   MAIN                                     */
+/* -------------------------------------------------------------------------- */
+/**
+ * Main function to handle the CLI input and generate CRUD based on the input.
+ * It uses inquirer to prompt the user for input.
+ * It checks if the entity already exists and exits the process if it does.
+ * It generates CRUD based on the user input.
+ * @returns {Promise<void>} - A Promise that resolves when CRUD is generated successfully
+ */
 async function main() {
   try {
     const args = process.argv.slice(2);
@@ -24,6 +41,14 @@ async function main() {
     };
 
     const { entity } = await inquirer.prompt(entityPrompt);
+
+    // Check if entity already exists
+    const entityExists = await isEntityExists(entity);
+
+    if (entityExists) {
+      console.log(`Entity "${entity}" already exists. Cannot generate CRUD.`);
+      process.exit(1);
+    }
 
     const commandPrompt = {
       type: 'list',
