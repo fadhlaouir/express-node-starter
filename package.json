@@ -1,5 +1,5 @@
 {
-  "name": "node-express-starter",
+  "name": "express-node-starter",
   "version": "1.0.0",
   "main": "server.js",
   "author": "@Raed Fadhlaoui <raed.fadhlaoui@hotmail.com>",
