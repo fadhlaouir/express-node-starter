@@ -3,9 +3,11 @@
 [![Author](http://img.shields.io/badge/author-@rfadhlaoui-blue.svg)](https://tn.linkedin.com/in/fadhlaouiraed)
 [![GitHub license](https://img.shields.io/github/license/maitraysuthar/rest-api-nodejs-mongodb.svg)](https://github.com/fadhlaouir/express-node-starter/blob/main/LICENSE)
 
-**REST API Developed with Node.js, Express, MongoDB, and Firebase**
+**REST API Developed with Node.js, Express, MongoDB**
 
-This project provides a robust API skeleton written in JavaScript ES6, suitable for any project. It offers features such as authentication, authorization, JWT tokens, role management, CRUD operations, email notifications, and more.
+## Overview
+
+This project provides a robust API skeleton written in JavaScript ES6, suitable for any project. It offers features such as authentication, authorization, JWT tokens, role management, CRUD operations, email notifications, and more. Additionally, it automates the generation of CRUD (Create, Read, Update, Delete) operations for entities within a MongoDB database, streamlining the development process for Node.js applications built on top of Express.js.
 
 ## Getting started
 
@@ -184,3 +186,12 @@ Every project needs improvements, Feel free to report any bugs or improvements. 
 ## License
 
 This project is open-sourced software licensed under the MIT License. See the LICENSE file for more information.
+
+## Credits
+
+- Raed FADHLAOUI: [Author Email](mailto:raed.fadhlaoui@hotmail.com)
+- Project Repository: [GitHub Repository](https://github.com/fadhlaouir/express-node-starter)
+
+## Support
+
+For any inquiries or issues, please contact [Support Email](raed.fadhlaoui@hotmail.com).
