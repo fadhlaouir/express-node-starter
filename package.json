@@ -27,6 +27,9 @@
     "mongodb",
     "restful-api"
   ],
+  "bin": {
+    "express-node-starter": "server.js"
+  },
   "dependencies": {
     "async": "^3.2.3",
     "babel-eslint": "^10.1.0",
