@@ -1,6 +1,9 @@
 const fs = require('fs').promises;
 
 async function generateEmptyCrud(entity) {
+  // Ensure the first character of the entity name is uppercase
+  entity = entity.charAt(0).toUpperCase() + entity.slice(1);
+
   const modelTemplate = `
     const mongoose = require('mongoose');
 
