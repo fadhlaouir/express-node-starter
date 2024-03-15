@@ -10,9 +10,6 @@ const bodyParser = require('body-parser');
 var cors = require('cors');
 const path = require('path');
 const mongoose = require('mongoose');
-// Firebase
-require('firebase/auth');
-require('firebase/firestore');
 
 // Swagger
 const swaggerUi = require('swagger-ui-express');
@@ -25,14 +22,11 @@ dotenv.config();
 const app = express();
 
 // DATABASE CONNECTION
+mongoose.set('strictQuery', false);
 mongoose.connect(
   process.env.NODE_ENV === 'production'
     ? process.env.PROD_DATABASE
     : process.env.DEV_DATABASE,
-  {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  },
   (err) => {
     if (err) {
       console.log(err);

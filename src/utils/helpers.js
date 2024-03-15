@@ -3,7 +3,6 @@
 /* -------------------------------------------------------------------------- */
 // Dependencies
 const _ = require('lodash');
-var admin = require('firebase-admin');
 
 /* -------------------------------------------------------------------------- */
 /*                                   HELPERS                                  */
@@ -40,33 +39,8 @@ function getfilteredObjectOfObject(object, lang) {
   return output[0];
 }
 
-/**
- * Fire base admin configuration to send notification for mobile users
- */
-const serviceAccount = {
-  type: process.env.FIREBASE_TYPE,
-  project_id: process.env.PROJECT_ID,
-  private_key_id: process.env.PRIVATE_KEY_ID,
-  private_key: process.env.PRIVATE_KEY,
-  client_email: process.env.CLIENT_EMAIL,
-  client_id: process.env.CLIENT_ID,
-  auth_uri: process.env.AUTH_URI,
-  token_uri: process.env.TOKEN_URI,
-  auth_provider_x509_cert_url: process.env.AUTH_PROVIDER,
-  client_x509_cert_url: process.env.CLIENT_CERT_URL,
-};
-
-/**
- * Initialize firebase app
- */
-const firebaseAdmin = admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-});
-
 // export module
 module.exports = {
   getfilteredArrayOfObject,
   getfilteredObjectOfObject,
-  serviceAccount,
-  firebaseAdmin,
 };
