@@ -2,6 +2,30 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## 1.0.0 (2024-03-15)
+
+
+### Features
+
+* Configure and Implement husky :tada: ([32d20d0](https://github.com/fadhlaouir/node-express-starter/commit/32d20d0aafb964dc71dbdbdb0c34f9638a22a05c))
+* Ensure the first letter of entity name is uppercase :tada: ([e492a10](https://github.com/fadhlaouir/node-express-starter/commit/e492a10e5d5c349d1c7c24d22205d4d82190380c))
+* Implement CRUD for user ([509df72](https://github.com/fadhlaouir/node-express-starter/commit/509df72a7d401ae2575a72ba747155efea0ea81c))
+* Implement Generate crud with CLI ([6704890](https://github.com/fadhlaouir/node-express-starter/commit/6704890b524271b07d9f0c3e6691531bcf2d6b4e))
+* Implement Generate crud with empty and minimal code :tada: ([0c5a466](https://github.com/fadhlaouir/node-express-starter/commit/0c5a4664b70a38d63183133bca3bc2f7c20a8a70))
+* Implement helpers for Email configuration :tada: ([809514b](https://github.com/fadhlaouir/node-express-starter/commit/809514b4269ee7eab01cc50e9bdc37d3d396023d))
+* Implement list-staged ([ae6951e](https://github.com/fadhlaouir/node-express-starter/commit/ae6951e1c79ae60f93a3251aa97ca890484e185a))
+* Implement sign up :Tada: ([72a297b](https://github.com/fadhlaouir/node-express-starter/commit/72a297b941b325902ddf2b383a605982f4a55bb8))
+* Optimise Email template for Authentification functions ([4490b12](https://github.com/fadhlaouir/node-express-starter/commit/4490b123a667a36f30cbb04b6b32147e74252a92))
+
+
+### Bug Fixes
+
+* Delete firebase from the project ([eb360cb](https://github.com/fadhlaouir/node-express-starter/commit/eb360cb113e8e2dc66d11c94ea7f57421a086328))
+* Fix login as an admin ([486da66](https://github.com/fadhlaouir/node-express-starter/commit/486da66d84a166b143f9556c465987070399a46e))
+* Fix path ([1fd66ce](https://github.com/fadhlaouir/node-express-starter/commit/1fd66ce3703d3ed161146ddbcdc68f456ea8b55e))
+* Fix path ([c31adf3](https://github.com/fadhlaouir/node-express-starter/commit/c31adf3cae262754f1e4c982dfd9e42569b8ba76))
+* Update CLIENT URL ([b737f27](https://github.com/fadhlaouir/node-express-starter/commit/b737f27324fcfafef81843f4ea287bd0ac0ee926))
+
 ## [1.0.0](https://github.com/Orange-Digital-Center-Tunisia/atgmo-api/compare/v0.1.1...v1.0.0) (2022-05-17)
 
 
