@@ -44,12 +44,12 @@ app.use(express.static(path.join(__dirname, 'uploads')));
 app.use(cors());
 
 // Require APIs
-const userRoutes = require('./src/routes/auth.route');
-const eventRoutes = require('./src/routes/event.route');
+const authRoutes = require('./src/routes/auth.route');
+const userRoutes = require('./src/routes/user.route');
 
 // local APIs
+app.use('/v1/api', authRoutes);
 app.use('/v1/api', userRoutes);
-app.use('/v1/api', eventRoutes);
 
 // API for uploads file (photo, galleries)
 app.get('/uploads/:id', (req, res) => {
