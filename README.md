@@ -77,21 +77,22 @@ npm install
 
 ```sh
 .
-├── app.js
-├── index.js
+├── .husky
+├── cli
+│   ├── generateCrud.js
+│   └── index.js
 ├── src
 │   ├── controllers
-│   │   ├── AuthController.js
-│   │   └── EventController.js
+│   │   ├── auth.controller.js
+│   │   └── user.ontroller.js
 │   ├── middlewares
 │   │   ├── multer.js
 │   │   └── verify-token.js
 │   ├── models
-│   │   ├── EventModel.js
 │   │   └── UserModel.js
 │   ├── routes
-│   │   ├── auth.js
-│   │   └── event.js
+│   │   ├── auth.route.js
+│   │   └── user.route.js
 │   ├── template
 │   │   └── userAccountEmailTemplates.js
 │   ├── utils
@@ -99,6 +100,10 @@ npm install
 │   └── swagger.js
 ├── uploads
 │   └── images.*
+├── .env.example
+├── .gitignore
+├── .eslintrc.json
+├── server.js
 └── package.json
 ```
 
