@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.1.0](https://github.com/fadhlaouir/node-express-starter/compare/v1.1.0...v0.1.0) (2024-03-15)
+
+
+### Features
+
+* Implement cli helpers ([5f12d5d](https://github.com/fadhlaouir/node-express-starter/commit/5f12d5d636a55570453e450233899d3dff673185))
+* Implement Generate Empty Crud :tada: ([71c6c7c](https://github.com/fadhlaouir/node-express-starter/commit/71c6c7c1f0be3a6129565a14aaaf01940ee3fdcb))
+* Implement Generate Minimal Crud :tada: ([8c12026](https://github.com/fadhlaouir/node-express-starter/commit/8c1202657ed38650c78dac61ba6d6aa9df6d286c))
+
 ## [1.1.0](https://github.com/fadhlaouir/node-express-starter/compare/v1.0.0...v1.1.0) (2024-03-15)
 
 
