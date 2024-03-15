@@ -5,11 +5,11 @@
 
 **REST API Developed with Node.js, Express, MongoDB, and Firebase**
 
-This project provides a robust API skeleton written in JavaScript ES2015, suitable for any project. It offers features such as authentication, authorization, JWT tokens, role management, CRUD operations, email notifications, and more.
+This project provides a robust API skeleton written in JavaScript ES6, suitable for any project. It offers features such as authentication, authorization, JWT tokens, role management, CRUD operations, email notifications, and more.
 
 ## Getting started
 
-This is a basic API skeleton written in JavaScript ES2015.
+This is a basic API skeleton written in JavaScript ES6.
 
 This project will run on **NodeJs** using **MongoDB** as database.
 
