@@ -1,7 +1,7 @@
 # Core API for Any Project
 
 [![Author](http://img.shields.io/badge/author-@rfadhlaoui-blue.svg)](https://tn.linkedin.com/in/fadhlaouiraed)
-[![GitHub license](https://img.shields.io/github/license/maitraysuthar/rest-api-nodejs-mongodb.svg)](https://github.com/fadhlaouir/node-express-starter/blob/main/LICENSE)
+[![GitHub license](https://img.shields.io/github/license/maitraysuthar/rest-api-nodejs-mongodb.svg)](https://github.com/fadhlaouir/express-node-starter/blob/main/LICENSE)
 
 **REST API Developed with Node.js, Express, MongoDB, and Firebase**
 
@@ -50,7 +50,7 @@ API Documentation [Swagger]
 1.  Clone the project from github.
 
 ```bash
-git clone https://github.com/fadhlaouir/node-express-starter.git
+git clone https://github.com/fadhlaouir/express-node-starter.git
 ```
 
 ### Using manual download ZIP
@@ -61,7 +61,7 @@ git clone https://github.com/fadhlaouir/node-express-starter.git
 ### Install npm dependencies after installing (Git or manual download)
 
 ```bash
-cd node-express-starter
+cd express-node-starter
 npm install
 ```
 
@@ -144,7 +144,7 @@ If you need to add more routes to the project just create a new file in `src/rou
 
 If you need to add more controllers to the project just create a new file in `src/controllers/` and use them in the routes.
 
-## OR use CLI for generate CRUD operations
+### Using the CLI to generate CRUD operations
 
 1. Navigate to the project directory.
 2. Run the following command:
@@ -161,6 +161,18 @@ Follow the prompts to select the CRUD type (empty or minimal) and provide the en
 
 ```bash
 npm run lint:check
+```
+
+### Fixing Eslint errors
+
+```bash
+npm run lint:fix
+```
+
+### Prettier for code formatting
+
+```bash
+npm run format:fix
 ```
 
 You can set custom rules for eslint in `.eslintrc.json` file, Added at project root.
