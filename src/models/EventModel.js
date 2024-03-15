@@ -7,30 +7,37 @@ const Schema = mongoose.Schema;
 /* -------------------------------------------------------------------------- */
 /*                                Event Schema                                */
 /* -------------------------------------------------------------------------- */
-const EventSchema = new Schema({
-  gallery: [String],
-  photo: String,
-  start_at: Date,
-  end_at: Date,
-  link: String,
-  isEvent: Boolean,
-  ar: {
-    event_name: { type: String, required: true },
-    description: String,
-    event_location: String,
+const EventSchema = new Schema(
+  {
+    gallery: [String],
+    photo: String,
+    title: { type: String, required: true },
+    description: {
+      type: String,
+      required: true,
+    },
+    date: {
+      type: Date,
+      required: true,
+    },
+    location: {
+      type: String,
+      required: true,
+    },
+    attendees: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+      },
+    ],
+    creator: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+    },
   },
-  fr: {
-    event_name: { type: String, required: true },
-    description: String,
-    event_location: String,
-  },
-  coordinates: {
-    latitude: String,
-    longitude: String,
-  },
-  createdAt: Date,
-  updatedAt: Date,
-});
+  { timestamps: true },
+);
 
 // export Event Schema
 module.exports = mongoose.model('Event', EventSchema);
