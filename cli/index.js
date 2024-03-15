@@ -1,4 +1,5 @@
-const { generateEmptyCrud, generateMinimalCrud } = require('./generateCrud');
+const { generateEmptyCrud } = require('./generateEmptyCrud');
+const { generateMinimalCrud } = require('./generateMinimalCrud');
 const inquirer = require('inquirer');
 
 async function main() {

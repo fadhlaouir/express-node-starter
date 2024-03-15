@@ -1,84 +1,5 @@
 const fs = require('fs').promises;
-
-async function generateEmptyCrud(entity) {
-  // Ensure the first character of the entity name is uppercase
-  entity = entity.charAt(0).toUpperCase() + entity.slice(1);
-
-  const modelTemplate = `
-    const mongoose = require('mongoose');
-
-    const ${entity}Schema = new mongoose.Schema({
-      // Define schema fields here
-    });
-
-    module.exports = mongoose.model('${entity}', ${entity}Schema);
-  `;
-
-  const controllerTemplate = `
-    const ${entity} = require('../models/${entity}.model');
-
-    // Create CRUD operations
-    async function create${entity}(req, res) {
-      // Implement create operation
-    }
-
-    async function get${entity}(req, res) {
-      // Implement read operation
-    }
-
-    async function update${entity}(req, res) {
-      // Implement update operation
-    }
-
-    async function delete${entity}(req, res) {
-      // Implement delete operation
-    }
-
-    module.exports = {
-      create${entity},
-      get${entity},
-      update${entity},
-      delete${entity},
-    };
-  `;
-
-  const routeTemplate = `
-    const express = require('express');
-    const router = express.Router();
-    const ${entity}Controller = require('../controllers/${entity}.controller');
-
-    // Define routes for ${entity} CRUD operations
-    router.post('/${entity}', ${entity}Controller.create${entity});
-    router.get('/${entity}s', ${entity}Controller.get${entity});
-    router.put('/${entity}s/:id', ${entity}Controller.update${entity});
-    router.delete('/${entity}s/:id', ${entity}Controller.delete${entity});
-
-    module.exports = router;
-  `;
-
-  await fs.mkdir(`src/models/${entity}`, { recursive: true });
-  await fs.mkdir(`src/controllers/${entity}`, { recursive: true });
-  await fs.mkdir(`src/routes/${entity}`, { recursive: true });
-
-  await fs.writeFile(`src/models/${entity}.model.js`, modelTemplate);
-  await fs.writeFile(
-    `src/controllers/${entity}.controller.js`,
-    controllerTemplate,
-  );
-  await fs.writeFile(`src/routes/${entity}.route.js`, routeTemplate);
-
-  // Line to add in server.js
-  const lineToAdd = `const ${entity}Routes = require('./src/routes/${entity}/${entity}.route');\napp.use('/v1/api', ${entity}Routes);\n`;
-
-  try {
-    // Append the line to server.js
-    const serverFilePath = path.join(__dirname, 'server.js');
-    await fs.appendFile(serverFilePath, lineToAdd);
-    console.log(`Added routes for ${entity} in server.js`);
-  } catch (error) {
-    console.error('Error appending route to server.js:', error);
-  }
-}
+const path = require('path');
 
 /**
  * Generate minimal CRUD operations for a given entity (model, controller, and route)
@@ -228,7 +149,7 @@ async function generateMinimalCrud(entity) {
 
   try {
     // Append the line to server.js
-    const serverFilePath = path.join(__dirname, 'server.js');
+    const serverFilePath = path.join(__dirname, './server.js');
     await fs.appendFile(serverFilePath, lineToAdd);
     console.log(`Added routes for ${entity} in server.js`);
   } catch (error) {
@@ -237,6 +158,5 @@ async function generateMinimalCrud(entity) {
 }
 
 module.exports = {
-  generateEmptyCrud,
   generateMinimalCrud,
 };
