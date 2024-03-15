@@ -5,11 +5,11 @@
 const router = require('express').Router();
 
 // Middlewares
-const { fileUpload } = require('../../middlewares/multer');
-const verifyToken = require('../../middlewares/verify-token');
+const { fileUpload } = require('../middlewares/multer');
+const verifyToken = require('../middlewares/verify-token');
 
 // controllers
-const eventController = require('../../controllers/EventController');
+const eventController = require('../controllers/EventController');
 
 /* -------------------------------------------------------------------------- */
 /*                                 Event Route                                */

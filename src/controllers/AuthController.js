@@ -27,10 +27,10 @@ const {
 const FROM_EMAIL = process.env.MAILER_EMAIL_ID;
 const AUTH_PASSWORD = process.env.MAILER_PASSWORD;
 
-const API_ENDPOINT =
+const CLIENT_API_ENDPOINT =
   process.env.NODE_ENV === 'production'
-    ? process.env.PRODUCTION_API_URL
-    : process.env.DEVELOPMENT_API_URL;
+    ? process.env.PRODUCTION_CLIENT_URL
+    : process.env.DEVELOPMENT_CLIENT_URL;
 
 var smtpTransport = nodemailer.createTransport({
   host: process.env.HOST,
@@ -106,7 +106,7 @@ const signUp = async (req, res) => {
       // config email template
       const template = singUpConfirmationEmailTemplate(
         newUser.fullName,
-        API_ENDPOINT,
+        CLIENT_API_ENDPOINT,
         newUser.email,
         newUser.confirmationCode,
       );
@@ -249,7 +249,7 @@ const forgotPassword = function (req, res) {
         const template = forgotPasswordEmailTemplate(
           user.fullName,
           user.email,
-          API_ENDPOINT,
+          CLIENT_API_ENDPOINT,
           token,
         );
         // config data for emailing
