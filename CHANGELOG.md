@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.1.0](https://github.com/fadhlaouir/node-express-starter/compare/v1.0.0...v1.1.0) (2024-03-15)
+
+
+### Features
+
+* After creating the entity import it in server.js :tada: ([45d2b14](https://github.com/fadhlaouir/node-express-starter/commit/45d2b149301d609471424fcce7471c0fea5955b5))
+
+
+### Bug Fixes
+
+* Update project name ([249fcdc](https://github.com/fadhlaouir/node-express-starter/commit/249fcdc2a1305292fd1c6c548eb7842c1fec2216))
+
 ## 1.0.0 (2024-03-15)
 
 
