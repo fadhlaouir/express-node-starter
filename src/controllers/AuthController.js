@@ -156,23 +156,17 @@ const signIn = async (req, res) => {
  */
 const adminSignIn = async (req, res) => {
   try {
+    const { email, password } = req.body;
+
     // Find the user by email
-    const foundUser = await User.findOne({ email: req.body.email });
+    const foundUser = await User.findOne({ email });
 
-    // If user not found, return error
-    if (!foundUser) {
+    // If user not found or password doesn't match, return error
+    if (!foundUser || !(await foundUser.comparePassword(password))) {
       return res.status(403).json({
         success: false,
-        message: "Échec de l'authentification, utilisateur introuvable",
-      });
-    }
-
-    // Check if password matches
-    const passwordMatches = await foundUser.comparePassword(req.body.password);
-    if (!passwordMatches) {
-      return res.status(403).json({
-        success: false,
-        message: "Échec de l'authentification, Mot de passe erroné",
+        message:
+          "Échec de l'authentification, utilisateur introuvable ou mot de passe erroné",
       });
     }
 
@@ -185,12 +179,9 @@ const adminSignIn = async (req, res) => {
       });
     }
 
-    // Check user
-    const userRole = ['is_admin', 'is_manager', 'is_doctor', 'is_nurse'];
-
-    const userCanAccess = userRole.includes(foundUser.role);
-
-    if (!userCanAccess) {
+    // Check user role
+    const allowedRoles = ['is_admin', 'is_manager'];
+    if (!allowedRoles.includes(foundUser.role)) {
       return res.status(403).json({
         success: false,
         message: "Vous n'êtes pas autorisé à vous connecter",
@@ -206,11 +197,16 @@ const adminSignIn = async (req, res) => {
       },
     );
 
-    // Return success response with token and user information
     return res.json({
       success: true,
       token,
-      user: foundUser,
+      // return user information without password field
+      user: {
+        _id: foundUser._id,
+        email: foundUser.email,
+        fullName: foundUser.fullName,
+        role: foundUser.role,
+      },
     });
   } catch (error) {
     return res.status(500).json({

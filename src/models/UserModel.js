@@ -14,7 +14,7 @@ const UserSchema = new Schema({
   fullName: String,
   photo: String,
   is_active: Boolean,
-  role: { type: String, require: true }, // is_manager, is_admin, is_doctor, is_nurse, is_patient, is_employee
+  role: { type: String, require: true }, // is_manager, is_admin, is_user
   confirmationCode: String,
   resetPasswordToken: String,
   resetPasswordExpires: String,
