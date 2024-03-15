@@ -9,7 +9,7 @@ const { fileUpload } = require('../middlewares/multer');
 const verifyToken = require('../middlewares/verify-token');
 
 // controllers
-const eventController = require('../controllers/EventController');
+const eventController = require('../controllers/event.controller');
 
 /* -------------------------------------------------------------------------- */
 /*                                 Event Route                                */

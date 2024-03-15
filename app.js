@@ -44,8 +44,8 @@ app.use(express.static(path.join(__dirname, 'uploads')));
 app.use(cors());
 
 // Require APIs
-const userRoutes = require('./src/routes/auth');
-const eventRoutes = require('./src/routes/event');
+const userRoutes = require('./src/routes/auth.route');
+const eventRoutes = require('./src/routes/event.route');
 
 // local APIs
 app.use('/v1/api', userRoutes);

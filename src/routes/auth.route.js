@@ -8,7 +8,7 @@ const router = require('express').Router();
 const { fileUpload } = require('../middlewares/multer');
 
 // controllers
-const authController = require('../controllers/AuthController');
+const authController = require('../controllers/auth.controller');
 
 /* -------------------------------------------------------------------------- */
 /*                                 Auth Route                                 */
