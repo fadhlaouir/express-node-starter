@@ -2,45 +2,57 @@
 /*                                Dependencies                                */
 /* -------------------------------------------------------------------------- */
 // Dependencies
-const _ = require('lodash');
+const nodemailer = require('nodemailer');
+
+// Environment variables
+const {
+  MAILER_EMAIL_ID: FROM_EMAIL,
+  MAILER_PASSWORD: AUTH_PASSWORD,
+  NODE_ENV,
+  PRODUCTION_CLIENT_URL,
+  DEVELOPMENT_CLIENT_URL,
+  HOST,
+  SECURE,
+  PORT_SSL,
+  MAILER_SERVICE_PROVIDER,
+} = process.env;
 
 /* -------------------------------------------------------------------------- */
 /*                                   HELPERS                                  */
 /* -------------------------------------------------------------------------- */
-/**
- * This function converts an Array of object into new Array of object except unwanted keys
- * example: we have an Array contain objects like obj:{ a:1, b:{x:'xx',d:'dd'}, c:2}
- * and we want to return values of object `b` without the key
- * the result is Array :[{ a:1, x:'xx', d:'dd', c:2},...]
- * @param {Array} array
- * @param {String} lang
- * @returns Array of object
- */
-function getfilteredArrayOfObject(array, lang) {
-  let newArray = [];
-  array.map((obj) => newArray.push({ ...obj, ...obj[`${lang}`] }));
-  let output = newArray.map((arr) => _.omit(arr, lang));
-  return output;
-}
+// API endpoint
+const API_ENDPOINT =
+  NODE_ENV === 'production' ? PRODUCTION_CLIENT_URL : DEVELOPMENT_CLIENT_URL;
+
+// SMTP transporter configuration
+const smtpTransport = nodemailer.createTransport({
+  host: HOST,
+  port: PORT_SSL,
+  secure: SECURE,
+  service: MAILER_SERVICE_PROVIDER,
+  auth: {
+    user: FROM_EMAIL,
+    pass: AUTH_PASSWORD,
+  },
+});
 
 /**
- * This function converts an object of object into new object except unwanted keys
- * example: we have an Object contain objects like obj:{ a:1, b:{x:'xx',d:'dd'}, c:2}
- * and we want to return values of object `b` without the key
- * the result is obj :{ a:1, x:'xx', d:'dd', c:2}
- * @param {Array} object
- * @param {String} lang
- * @returns Array of object
+ * Send email using SMTP transporter
+ * @param {Object} data - Email data including from, to, subject, and html
+ * @returns {Promise} Promise indicating success or failure of email sending
  */
-function getfilteredObjectOfObject(object, lang) {
-  let newArray = [];
-  newArray.push({ ...object, ...object[`${lang}`] });
-  let output = newArray.map((arr) => _.omit(arr, lang));
-  return output[0];
-}
+const sendEmail = (data) => {
+  return new Promise((resolve, reject) => {
+    smtpTransport.sendMail(data, (err) => {
+      if (err) reject(err); // Reject with error
+      else resolve(); // Resolve if successful
+    });
+  });
+};
 
 // export module
 module.exports = {
-  getfilteredArrayOfObject,
-  getfilteredObjectOfObject,
+  API_ENDPOINT,
+  smtpTransport,
+  sendEmail,
 };
