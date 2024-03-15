@@ -70,13 +70,26 @@ async function generateEmptyCrud(entity) {
   await fs.writeFile(`src/routes/${entity}.route.js`, routeTemplate);
 
   // Line to add in server.js
-  const lineToAdd = `const ${entity}Routes = require('./src/routes/${entity}.route');\napp.use('/v1/api', ${entity}Routes);\n`;
+  const lineToAdd = `const ${entity}Routes = require('./src/routes/${entity}.route');\n\napp.use('/v1/api', ${entity}Routes);\n`;
 
   try {
-    // Append the line to server.js
+    // Read the content of server.js
     const serverFilePath = path.join('server.js');
-    await fs.appendFile(serverFilePath, lineToAdd);
-    console.log(`Added routes for ${entity} in server.js`);
+    let serverFileContent = await fs.readFile(serverFilePath, 'utf-8');
+
+    // Split the content by newlines
+    let lines = serverFileContent.split('\n');
+
+    // Insert the lineToAdd at line 48
+    lines.splice(47, 0, lineToAdd);
+
+    // Join the lines back into a string
+    serverFileContent = lines.join('\n');
+
+    // Write the modified content back to server.js
+    await fs.writeFile(serverFilePath, serverFileContent);
+
+    console.log(`Added routes for ${entity} in server.js at line 48`);
   } catch (error) {
     console.error('Error appending route to server.js:', error);
   }
