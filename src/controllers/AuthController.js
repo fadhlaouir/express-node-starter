@@ -102,22 +102,16 @@ const signUp = async (req, res) => {
  */
 const signIn = async (req, res) => {
   try {
+    const { email, password } = req.body;
+
     // Find the user by email
-    const foundUser = await User.findOne({ email: req.body.email });
+    const foundUser = await User.findOne({ email });
 
-    // If user not found, return error
-    if (!foundUser) {
+    // If user not found or password doesn't match, return error
+    if (!foundUser || !foundUser.comparePassword(password)) {
       return res.status(403).json({
         success: false,
-        message: "Échec de l'authentification, utilisateur introuvable",
-      });
-    }
-
-    // Check if password matches
-    if (!foundUser.comparePassword(req.body.password)) {
-      return res.status(403).json({
-        success: false,
-        message: "Échec de l'authentification, Mot de passe erroné",
+        message: "Échec de l'authentification, email ou mot de passe incorrect",
       });
     }
 
@@ -132,14 +126,19 @@ const signIn = async (req, res) => {
 
     // Generate JWT token
     const token = jwt.sign(foundUser.toJSON(), process.env.SECRET, {
-      expiresIn: 604800,
+      expiresIn: '7d', // Token expires in 7 days
     });
 
     // Return success response with token and user information
     return res.json({
       success: true,
       token,
-      user: foundUser,
+      user: {
+        _id: foundUser._id,
+        email: foundUser.email,
+        fullName: foundUser.fullName,
+        role: foundUser.role,
+      },
     });
   } catch (error) {
     return res.status(500).json({

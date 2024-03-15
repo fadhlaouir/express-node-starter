@@ -15,7 +15,7 @@ const authController = require('../controllers/AuthController');
 /* -------------------------------------------------------------------------- */
 
 // POST request - create new user
-router.post('/auth/signup', fileUpload, authController.signUp);
+router.post('/auth/register', fileUpload, authController.signUp);
 
 // POST request - sign in as a user
 router.post('/auth/login', authController.signIn);

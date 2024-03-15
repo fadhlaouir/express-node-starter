@@ -11,20 +11,15 @@ const bcrypt = require('bcrypt-nodejs');
 const UserSchema = new Schema({
   email: { type: String, unique: true, required: true },
   password: { type: String, required: true },
+  fullName: String,
+  photo: String,
+  is_active: Boolean,
+  role: { type: String, require: true }, // is_manager, is_admin, is_doctor, is_nurse, is_patient, is_employee
   confirmationCode: String,
   resetPasswordToken: String,
   resetPasswordExpires: String,
-  fullName: String,
-  photo: String,
-  governorate: String,
-  municipality: String,
-  age: String,
-  gender: String,
-  dateOfBirth: String,
-  phoneNumber: String,
-  is_active: Boolean,
-  is_admin: Boolean,
-  is_manager: Boolean,
+  joined_at: Date,
+  updated_at: Date,
 });
 
 /* -------------------------------------------------------------------------- */
