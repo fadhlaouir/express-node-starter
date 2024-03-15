@@ -66,6 +66,18 @@ async function generateEmptyCrud(entity) {
     controllerTemplate,
   );
   await fs.writeFile(`src/routes/${entity}.route.js`, routeTemplate);
+
+  // Line to add in server.js
+  const lineToAdd = `const ${entity}Routes = require('./src/routes/${entity}/${entity}.route');\napp.use('/v1/api', ${entity}Routes);\n`;
+
+  try {
+    // Append the line to server.js
+    const serverFilePath = path.join(__dirname, 'server.js');
+    await fs.appendFile(serverFilePath, lineToAdd);
+    console.log(`Added routes for ${entity} in server.js`);
+  } catch (error) {
+    console.error('Error appending route to server.js:', error);
+  }
 }
 
 /**
@@ -210,6 +222,18 @@ async function generateMinimalCrud(entity) {
     controllerTemplate,
   );
   await fs.writeFile(`src/routes/${entity}.route.js`, routeTemplate);
+
+  // Line to add in server.js
+  const lineToAdd = `const ${entity}Routes = require('./src/routes/${entity}/${entity}.route');\napp.use('/v1/api', ${entity}Routes);\n`;
+
+  try {
+    // Append the line to server.js
+    const serverFilePath = path.join(__dirname, 'server.js');
+    await fs.appendFile(serverFilePath, lineToAdd);
+    console.log(`Added routes for ${entity} in server.js`);
+  } catch (error) {
+    console.error('Error appending route to server.js:', error);
+  }
 }
 
 module.exports = {
