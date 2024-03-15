@@ -1,11 +1,11 @@
 # Core API for Any Project
 
 [![Author](http://img.shields.io/badge/author-@rfadhlaoui-blue.svg)](https://tn.linkedin.com/in/fadhlaouiraed)
-[![GitHub license](https://img.shields.io/github/license/maitraysuthar/rest-api-nodejs-mongodb.svg)](https://github.com/Orange-Digital-Center-Tunisia/express-mongodb-api-architecture/blob/master/LICENSE)
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/74c872e6a5ac45ce91ce0e24b6e57085)](https://www.codacy.com?utm_source=github.com&utm_medium=referral&utm_content=Orange-Digital-Center-Tunisia/express-mongodb-api-architecture&utm_campaign=Badge_Grade)
-![Travis (.com)](https://img.shields.io/travis/com/maitraysuthar/rest-api-nodejs-mongodb)
+[![GitHub license](https://img.shields.io/github/license/maitraysuthar/rest-api-nodejs-mongodb.svg)](https://github.com/fadhlaouir/node-express-starter/blob/main/LICENSE)
 
-REST API Developed with Node.js, Express, MongoDB and Firebase
+**REST API Developed with Node.js, Express, MongoDB, and Firebase**
+
+This project provides a robust API skeleton written in JavaScript ES2015, suitable for any project. It offers features such as authentication, authorization, JWT tokens, role management, CRUD operations, email notifications, and more.
 
 ## Getting started
 
@@ -29,17 +29,19 @@ API Documentation [Swagger]
 - Validations added.
 - Included API collection for Postman.
 - Light-weight project.
-- Linting with [Eslint](https://eslint.org/).
+- Linting with [Eslint](https://eslint.org/). (Airbnb style)
+- Included CLI for generate CRUD operations.
+- husky for pre-commit hooks and lint-staged for running linters on git staged files.
 
 ## Software Requirements
 
-- Node.js **14+**
+- Node.js **16+**
 - MongoDB **4+**
 
 ### Engines
 
-- node **>=14.16.0 <=16.13.0**
-- npm **>=6.14.11 <=8.1.0**
+- node **>=14.16.0 <=20.11.0**
+- npm **>=6.14.11 <=10.2.4**
 
 ## How to install
 
@@ -48,7 +50,7 @@ API Documentation [Swagger]
 1.  Clone the project from github.
 
 ```bash
-git clone https://github.com/fadhlaouir/express-mongodb-api-architecture.git
+git clone https://github.com/fadhlaouir/node-express-starter.git
 ```
 
 ### Using manual download ZIP
@@ -59,7 +61,7 @@ git clone https://github.com/fadhlaouir/express-mongodb-api-architecture.git
 ### Install npm dependencies after installing (Git or manual download)
 
 ```bash
-cd express-mongodb-api-architecture
+cd node-express-starter
 npm install
 ```
 
@@ -141,6 +143,17 @@ If you need to add more routes to the project just create a new file in `src/rou
 ### Creating new controllers
 
 If you need to add more controllers to the project just create a new file in `src/controllers/` and use them in the routes.
+
+## OR use CLI for generate CRUD operations
+
+1. Navigate to the project directory.
+2. Run the following command:
+
+```bash
+npm run generate-crud
+```
+
+Follow the prompts to select the CRUD type (empty or minimal) and provide the entity name. The tool will generate the necessary files for the CRUD operations based on your selection.
 
 ## ESLint
 
