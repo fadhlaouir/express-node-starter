@@ -1,4 +1,4 @@
-# Core API for Any Project
+# Express Node Starter: Empowering Your API Development Journey
 
 [![Author](http://img.shields.io/badge/author-@rfadhlaoui-blue.svg)](https://tn.linkedin.com/in/fadhlaouiraed)
 [![GitHub license](https://img.shields.io/github/license/maitraysuthar/rest-api-nodejs-mongodb.svg)](https://github.com/fadhlaouir/express-node-starter/blob/main/LICENSE)
