@@ -1,98 +1,133 @@
+/* -------------------------------------------------------------------------- */
+/*                                DEPENDENCIES                                */
+/* -------------------------------------------------------------------------- */
+// packages
 const fs = require('fs').promises;
 const path = require('path');
 
+// local helpers
+const { capitalizeEntity } = require('./helpers');
+
+/* -------------------------------------------------------------------------- */
+/*                             generate Empty Crud                            */
+/* -------------------------------------------------------------------------- */
+/**
+ * Generates an empty CRUD (Create, Read, Update, Delete) skeleton for the specified entity.
+ * @param {string} entity - The name of the entity for which CRUD operations will be generated.
+ */
 async function generateEmptyCrud(entity) {
-  // Ensure the first character of the entity name is uppercase
-  const ENTITY = entity.charAt(0).toUpperCase() + entity.slice(1);
+  // Capitalize the first character of the entity name
+  const ENTITY = capitalizeEntity(entity);
 
-  /**
-   * modelTemplate is a string that contains the template for the model file.
-   * It uses the entity name to create the model file.
-   * The model file is created in the src/models directory.
-   */
-  const modelTemplate = `
-    const mongoose = require('mongoose');
+  // Generate model, controller, and route templates
+  const modelTemplate = generateModelTemplate(ENTITY);
+  const controllerTemplate = generateControllerTemplate(ENTITY, entity);
+  const routeTemplate = generateRouteTemplate(ENTITY, entity);
 
-    const ${ENTITY}Schema = new mongoose.Schema({
-      // Define schema fields here
-    });
+  // Write model, controller, and route files
+  await Promise.all([
+    fs.writeFile(`src/models/${entity}.model.js`, modelTemplate),
+    fs.writeFile(`src/controllers/${entity}.controller.js`, controllerTemplate),
+    fs.writeFile(`src/routes/${entity}.route.js`, routeTemplate),
+  ]);
 
-    module.exports = mongoose.model('${ENTITY}', ${ENTITY}Schema);
-  `;
-
-  const controllerTemplate = `
-    const ${ENTITY} = require('../models/${entity}.model');
-
-    // Create CRUD operations
-    async function create${ENTITY}(req, res) {
-      // Implement create operation
-    }
-
-    async function get${ENTITY}(req, res) {
-      // Implement read operation
-    }
-
-    async function update${ENTITY}(req, res) {
-      // Implement update operation
-    }
-
-    async function delete${ENTITY}(req, res) {
-      // Implement delete operation
-    }
-
-    module.exports = {
-      create${ENTITY},
-      get${ENTITY},
-      update${ENTITY},
-      delete${ENTITY},
-    };
-  `;
-
-  const routeTemplate = `
-    const express = require('express');
-    const router = express.Router();
-    const ${ENTITY}Controller = require('../controllers/${entity}.controller');
-
-    // Define routes for ${ENTITY} CRUD operations
-    router.post('/${entity}', ${ENTITY}Controller.create${ENTITY});
-    router.get('/${entity}s', ${ENTITY}Controller.get${ENTITY});
-    router.put('/${entity}s/:id', ${ENTITY}Controller.update${ENTITY});
-    router.delete('/${entity}s/:id', ${ENTITY}Controller.delete${ENTITY});
-
-    module.exports = router;
-  `;
-
-  await fs.writeFile(`src/models/${entity}.model.js`, modelTemplate);
-  await fs.writeFile(
-    `src/controllers/${entity}.controller.js`,
-    controllerTemplate,
-  );
-  await fs.writeFile(`src/routes/${entity}.route.js`, routeTemplate);
-
-  // Line to add in server.js
+  // Add route to server.js
   const lineToAdd = `const ${entity}Routes = require('./src/routes/${entity}.route');\n\napp.use('/v1/api', ${entity}Routes);\n`;
-
   try {
-    // Read the content of server.js
     const serverFilePath = path.join('server.js');
     let serverFileContent = await fs.readFile(serverFilePath, 'utf-8');
-
-    // Split the content by newlines
     let lines = serverFileContent.split('\n');
-
-    // Insert the lineToAdd at line 48
     lines.splice(47, 0, lineToAdd);
-
-    // Join the lines back into a string
     serverFileContent = lines.join('\n');
-
-    // Write the modified content back to server.js
     await fs.writeFile(serverFilePath, serverFileContent);
-
     console.log(`Added routes for ${entity} in server.js at line 48`);
   } catch (error) {
     console.error('Error appending route to server.js:', error);
   }
+}
+
+/* -------------------------------------------------------------------------- */
+/*                           generate Model Template                          */
+/* -------------------------------------------------------------------------- */
+/**
+ * Generates the template for the model file.
+ * @param {string} entity - The name of the entity.
+ * @returns {string} - The model template.
+ */
+function generateModelTemplate(entity) {
+  return `
+    const mongoose = require('mongoose');
+
+    const ${entity}Schema = new mongoose.Schema({
+      // Define schema fields here
+    });
+
+    module.exports = mongoose.model('${entity}', ${entity}Schema);
+  `;
+}
+
+/* -------------------------------------------------------------------------- */
+/*                        generate Controller Template                        */
+/* -------------------------------------------------------------------------- */
+/**
+ * Generates the template for the controller file.
+ * @param {string} entity - The name of the entity.
+ * @param {string} originalEntity - The original, uncapitalized entity name.
+ * @returns {string} - The controller template.
+ */
+function generateControllerTemplate(entity, originalEntity) {
+  return `
+    const ${entity} = require('../models/${originalEntity}.model');
+
+    // Create CRUD operations
+    async function create${entity}(req, res) {
+      // Implement create operation
+    }
+
+    async function get${entity}(req, res) {
+      // Implement read operation
+    }
+
+    async function update${entity}(req, res) {
+      // Implement update operation
+    }
+
+    async function delete${entity}(req, res) {
+      // Implement delete operation
+    }
+
+    module.exports = {
+      create${entity},
+      get${entity},
+      update${entity},
+      delete${entity},
+    };
+  `;
+}
+
+/* -------------------------------------------------------------------------- */
+/*                           generate Route Template                          */
+/* -------------------------------------------------------------------------- */
+/**
+ * Generates the template for the route file.
+ * @param {string} entity - The name of the entity.
+ * @param {string} originalEntity - The original, uncapitalized entity name.
+ * @returns {string} - The route template.
+ */
+function generateRouteTemplate(entity, originalEntity) {
+  return `
+    const express = require('express');
+    const router = express.Router();
+    const ${entity}Controller = require('../controllers/${originalEntity}.controller');
+
+    // Define routes for ${entity} CRUD operations
+    router.post('/${originalEntity}', ${entity}Controller.create${entity});
+    router.get('/${originalEntity}s', ${entity}Controller.get${entity});
+    router.put('/${originalEntity}s/:id', ${entity}Controller.update${entity});
+    router.delete('/${originalEntity}s/:id', ${entity}Controller.delete${entity});
+
+    module.exports = router;
+  `;
 }
 
 module.exports = {
