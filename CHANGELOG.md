@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.7.0](https://github.com/fadhlaouir/express-node-starter/compare/v1.6.0...v1.7.0) (2024-03-18)
+
+
+### Features
+
+* Pulish the project as npx ([2d57879](https://github.com/fadhlaouir/express-node-starter/commit/2d578794fb6dec0ee4912e7a815ed4b0166d3733))
+* Pulish the project as npx :tada: ([7e84999](https://github.com/fadhlaouir/express-node-starter/commit/7e84999b8869a777333100f429866de1acb8dea6))
+
 ## [1.6.0](https://github.com/fadhlaouir/express-node-starter/compare/v1.5.0...v1.6.0) (2024-03-18)
 
 ## [1.5.0](https://github.com/fadhlaouir/node-express-starter/compare/v1.3.0...v1.5.0) (2024-03-18)
