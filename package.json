@@ -8,7 +8,7 @@
   "scripts": {
     "start": "NODE_ENV=production && node server.js",
     "develop": "SET NODE_ENV=development && nodemon server.js",
-    "create-operation": "node cli/index.js generate",
+    "crud-operation": "node cli/index.js generate",
     "lint:check": "eslint --ext .js,.jsx,.ts,.tsx .",
     "format:check": "prettier --check .",
     "lint:fix": "eslint --ext .js,.jsx,.ts,.tsx --fix .",

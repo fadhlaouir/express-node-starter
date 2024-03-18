@@ -47,6 +47,7 @@ const userRoutes = require('./src/routes/user.route');
 const authRoutes = require('./src/routes/auth.route');
 
 
+
 // local APIs
 app.use('/v1/api', authRoutes);
 app.use('/v1/api', userRoutes);
