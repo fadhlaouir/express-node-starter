@@ -37,7 +37,7 @@ API Documentation [Swagger]
 ## Features
 
 - Authentication and Authorization
-- JWT Tokens, make requests with a token after login with `Authorization` header with value `Bearer yourToken` where `yourToken` will be returned in Login response.
+- JWT Tokens, make requests with a token after login with `Authorization` header with value `Bearer yourToken` where `yourToken` will be returned in the Login response.
 - Role Manage
 - Update Profile/Password User Account
 - Reset Password Mail using `nodemailer`
@@ -49,7 +49,7 @@ API Documentation [Swagger]
 - Included API collection for Postman.
 - Light-weight project.
 - Linting with [Eslint](https://eslint.org/). (Airbnb style)
-- Included CLI for generate CRUD operations.
+- Included CLI for generating CRUD operations.
 - husky for pre-commit hooks and lint-staged for running linters on git staged files.
 
 ## Software Requirements
@@ -169,8 +169,10 @@ If you need to add more controllers to the project just create a new file in `sr
 2. Run the following command:
 
 ```bash
-npm run generate-crud
+npm run crud-operation
 ```
+
+See the [CLI README](cli/README.md) section for more details on how to use the CLI to generate or delete CRUD operations.
 
 Follow the prompts to select the CRUD type (empty or minimal) and provide the entity name. The tool will generate the necessary files for the CRUD operations based on your selection.
 
@@ -212,3 +214,15 @@ This project is open-sourced software licensed under the MIT License. See the LI
 ## Support
 
 For any inquiries or issues, please contact [Support Email](raed.fadhlaoui@hotmail.com).
+
+- **Optimization**: Improved readability by reorganizing the content and ensuring consistency in formatting.
+- **Documentation Update**: Reflects the changes made to the CLI commands for generating and deleting CRUD operations.
+- **Bug Fixes**: Resolved issues related to the CLI commands and the project structure.
+- **Feature Addition**: Added support for generating empty and minimal CRUD operations using the CLI.
+- **Code Quality**: Improved code quality by adding linting and formatting tools.
+- **Security**: Updated dependencies to address security vulnerabilities.
+- **Testing**: Added support for running tests using Jest.
+- **Performance**: Improved performance by optimizing the code and removing unnecessary dependencies.
+- **Refactoring**: Refactored the code to improve readability and maintainability.
+- **Dependency Update**: Updated dependencies to their latest versions.
+- **Configuration**: Updated the configuration files to reflect the changes made to the project structure.

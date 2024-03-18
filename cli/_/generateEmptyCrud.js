@@ -32,7 +32,7 @@ async function generateEmptyCrud(entity) {
   ]);
 
   // Add route to server.js
-  const lineToAdd = `const ${entity}Routes = require('./src/routes/${entity}.route');\n\napp.use('/v1/api', ${entity}Routes);\n`;
+  const lineToAdd = `const ${entity}Routes = require('./src/routes/${entity}.route');\napp.use('/v1/api', ${entity}Routes);\n`;
   try {
     const serverFilePath = path.join('server.js');
     let serverFileContent = await fs.readFile(serverFilePath, 'utf-8');

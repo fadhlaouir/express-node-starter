@@ -5,86 +5,44 @@
 const inquirer = require('inquirer'); // For prompting user input
 
 // Local helpers and functions
-const { generateEmptyCrud } = require('./generateEmptyCrud'); // Function to generate empty CRUD
-const { generateMinimalCrud } = require('./generateMinimalCrud'); // Function to generate minimal CRUD
-const { isEntityExists } = require('./helpers'); // Function to check if entity already exists
+const { generateEmptyCrud } = require('./_/generateEmptyCrud'); // Function to generate empty CRUD
+const { generateMinimalCrud } = require('./_/generateMinimalCrud'); // Function to generate minimal CRUD
+const { deleteCrud } = require('./_/deleteCrud'); // Function to delete CRUD
+const { isEntityExists } = require('./_/helpers'); // Function to check if entity already exists
 
 /* -------------------------------------------------------------------------- */
 /*                                   MAIN                                     */
 /* -------------------------------------------------------------------------- */
 /**
- * Main function to handle the CLI input and generate CRUD based on the user input.
- * It prompts the user for the entity name and CRUD type, performs validation,
- * checks if the entity already exists, and generates CRUD based on user input.
- * @returns {Promise<void>} - A Promise that resolves when CRUD is generated successfully
+ * Main function to handle the CLI input for generating or deleting CRUD operations.
+ * It prompts the user for the action to perform and handles the corresponding action.
+ * @returns {Promise<void>} - A Promise that resolves when the action is performed successfully
  */
 async function main() {
   try {
-    // Parse command line arguments
-    const args = process.argv.slice(2);
-
-    // Check if command is valid
-    if (args.length < 1 || args[0] !== 'generate') {
-      console.log('Invalid command. Use "generate" command.');
-      process.exit(1);
-    }
-
-    // Prompt user to enter entity name
-    const entityPrompt = {
-      type: 'input',
-      name: 'entity',
-      message: 'Enter entity name:',
-      validate: async (input) => {
-        // Trim leading and trailing whitespace
-        const trimmedInput = input.trim();
-
-        // Check if entity name is empty after trimming
-        if (!trimmedInput) {
-          return 'Entity name cannot be empty';
-        }
-
-        // Check if entity name contains only alphanumeric characters and underscores
-        if (!/^[a-zA-Z0-9_]+$/.test(trimmedInput)) {
-          return 'Entity name can only contain letters, numbers, and underscores';
-        }
-
-        // Check if entity name already exists
-        const entityExists = await isEntityExists(trimmedInput);
-        if (entityExists) {
-          return `Entity "${trimmedInput}" already exists. Cannot generate CRUD.`;
-        }
-
-        // Validation passed
-        return true;
-      },
-    };
-
-    // Get entity name from user input
-    const { entity } = await inquirer.prompt(entityPrompt);
-
-    // Prompt user to select CRUD type
-    const commandPrompt = {
+    // Interactive prompt for selecting action
+    const actionPrompt = {
       type: 'list',
-      name: 'command',
-      message: 'Select CRUD type:',
-      choices: ['empty', 'minimal'],
+      name: 'action',
+      message: 'Select action:',
+      choices: ['Generate CRUD', 'Delete CRUD', 'Exit'],
     };
 
-    // Get CRUD type from user input
-    const { command } = await inquirer.prompt(commandPrompt);
+    const { action } = await inquirer.prompt(actionPrompt);
 
-    // Generate CRUD based on user input
-    switch (command) {
-      case 'empty':
-        await generateEmptyCrud(entity, generateEmptyCrud);
-        console.log('Empty CRUD generated successfully for entity:', entity);
+    switch (action) {
+      case 'Generate CRUD':
+        await generateCrud();
         break;
-      case 'minimal':
-        await generateMinimalCrud(entity, generateMinimalCrud);
-        console.log('Minimal CRUD generated successfully for entity:', entity);
+      case 'Delete CRUD':
+        await deleteCrudAction();
+        break;
+      case 'Exit':
+        console.log('Exiting...');
+        process.exit(0);
         break;
       default:
-        console.log('Invalid command:', command);
+        console.log('Invalid action:', action);
         process.exit(1);
     }
   } catch (error) {
@@ -94,5 +52,98 @@ async function main() {
   }
 }
 
-// Invoke main function
-main();
+/**
+ * Function to handle the CRUD generation process.
+ * @returns {Promise<void>} - A Promise that resolves when CRUD is generated successfully
+ */
+async function generateCrud() {
+  try {
+    // Prompt user to enter entity name
+    const entityPrompt = {
+      type: 'input',
+      name: 'entity',
+      message: 'Enter entity name:',
+      validate: async (input) => {
+        const trimmedInput = input.trim();
+        if (!trimmedInput) {
+          return 'Entity name cannot be empty';
+        }
+        if (!/^[a-zA-Z0-9_]+$/.test(trimmedInput)) {
+          return 'Entity name can only contain letters, numbers, and underscores';
+        }
+        const entityExists = await isEntityExists(trimmedInput);
+        if (entityExists) {
+          return `Entity "${trimmedInput}" already exists. Cannot generate CRUD.`;
+        }
+        return true;
+      },
+    };
+
+    const { entity } = await inquirer.prompt(entityPrompt);
+
+    const commandPrompt = {
+      type: 'list',
+      name: 'command',
+      message: 'Select CRUD type:',
+      choices: ['empty', 'minimal'],
+    };
+
+    const { command } = await inquirer.prompt(commandPrompt);
+
+    switch (command) {
+      case 'empty':
+        await generateEmptyCrud(entity);
+        console.log('Empty CRUD generated successfully for entity:', entity);
+        console.log('Exiting...');
+        process.exit(0);
+        break;
+      case 'minimal':
+        await generateMinimalCrud(entity);
+        console.log('Minimal CRUD generated successfully for entity:', entity);
+        console.log('Exiting...');
+        process.exit(0);
+        break;
+      default:
+        console.log('Invalid command:', command);
+        process.exit(1);
+    }
+  } catch (error) {
+    console.error('An error occurred during CRUD generation:', error);
+    process.exit(1);
+  }
+}
+
+/**
+ * Function to handle the CRUD deletion process.
+ * @returns {Promise<void>} - A Promise that resolves when CRUD is deleted successfully
+ */
+async function deleteCrudAction() {
+  try {
+    // Prompt user to enter entity name for deletion
+    const entityPrompt = {
+      type: 'input',
+      name: 'entity',
+      message: 'Enter entity name to delete CRUD:',
+      validate: async (input) => {
+        const trimmedInput = input.trim();
+        if (!trimmedInput) {
+          return 'Entity name cannot be empty';
+        }
+        return true;
+      },
+    };
+
+    const { entity } = await inquirer.prompt(entityPrompt);
+    await deleteCrud(entity);
+  } catch (error) {
+    console.error('An error occurred during CRUD deletion:', error);
+    process.exit(1);
+  }
+}
+
+// Invoke main function if the script is run directly
+if (require.main === module) {
+  main();
+}
+
+module.exports = { generateCrud, deleteCrudAction };

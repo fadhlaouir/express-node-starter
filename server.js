@@ -1,7 +1,6 @@
 /* -------------------------------------------------------------------------- */
 /*                                Dependencies                                */
 /* -------------------------------------------------------------------------- */
-
 // Packages
 const express = require('express');
 const dotenv = require('dotenv');
@@ -44,8 +43,9 @@ app.use(express.static(path.join(__dirname, 'uploads')));
 app.use(cors());
 
 // Require APIs
-const authRoutes = require('./src/routes/auth.route');
 const userRoutes = require('./src/routes/user.route');
+const authRoutes = require('./src/routes/auth.route');
+
 
 // local APIs
 app.use('/v1/api', authRoutes);
