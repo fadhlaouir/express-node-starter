@@ -24,6 +24,9 @@
     "type": "git",
     "url": "git+https://github.com/fadhlaouir/express-node-starter.git"
   },
+  "bin": {
+    "express-node-starter": "./cli/index.js"
+  },
   "keywords": [
     "node.js",
     "express.js",
@@ -31,9 +34,6 @@
     "mongodb",
     "restful-api"
   ],
-  "bin": {
-    "express-node-starter": "server.js"
-  },
   "dependencies": {
     "async": "^3.2.3",
     "babel-eslint": "^10.1.0",

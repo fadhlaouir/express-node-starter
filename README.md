@@ -100,12 +100,17 @@ npm install
 .
 ├── .husky
 ├── cli
+│   ├── _
+│   │   ├── deleteCrud.js
+│   │   ├── generateEmptyCrud.js
+│   │   ├── generateMinimalCrud.js
+│   │   └── helpers.js
 │   ├── generateCrud.js
 │   └── index.js
 ├── src
 │   ├── controllers
 │   │   ├── auth.controller.js
-│   │   └── user.ontroller.js
+│   │   └── user.controller.js
 │   ├── middlewares
 │   │   ├── multer.js
 │   │   └── verify-token.js
