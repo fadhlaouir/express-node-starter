@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.4.0](https://github.com/fadhlaouir/node-express-starter/compare/v1.3.0...v1.4.0) (2024-03-18)
+
+
+### Features
+
+* implement the ability for users to define custom templates for generating CRUD files :tada: ([4820eae](https://github.com/fadhlaouir/node-express-starter/commit/4820eaeb9e45154c2cbc0bf122544755708195f2))
+* Implement validation rules for the entity name in the provided code ([bf9b221](https://github.com/fadhlaouir/node-express-starter/commit/bf9b2215861ebbb360dca9c03d5b571f1b19ddc9))
+* Implemented CLI functionality for generating and deleting CRUD operations. Updated README with CLI documentation ([95bde0d](https://github.com/fadhlaouir/node-express-starter/commit/95bde0d40be85dd0b250e5ff21faf5c53e13a276))
+* Optimise delete function ([03499e8](https://github.com/fadhlaouir/node-express-starter/commit/03499e88762c94f080819f604fe144047802b309))
+
 ## [1.3.0](https://github.com/fadhlaouir/node-express-starter/compare/v1.2.0...v1.3.0) (2024-03-15)
 
 
