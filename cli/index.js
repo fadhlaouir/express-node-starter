@@ -3,6 +3,8 @@
 /* -------------------------------------------------------------------------- */
 // packages
 const inquirer = require('inquirer');
+const fs = require('fs').promises;
+const path = require('path');
 
 // local helpers and functions
 const { generateEmptyCrud } = require('./generateEmptyCrud');
@@ -59,13 +61,44 @@ async function main() {
 
     const { command } = await inquirer.prompt(commandPrompt);
 
+    // Ask user if they want to use custom templates
+    const useCustomTemplate = await inquirer.prompt({
+      type: 'confirm',
+      name: 'useCustomTemplate',
+      message: 'Do you want to use custom templates for CRUD generation?',
+    });
+
+    let templatePath = null;
+
+    if (useCustomTemplate.useCustomTemplate) {
+      const templatePathPrompt = {
+        type: 'input',
+        name: 'templatePath',
+        message: 'Enter the path to your custom template directory:',
+        validate: async (input) => {
+          const fullPath = path.resolve(input);
+          try {
+            await fs.access(fullPath, fs.constants.R_OK);
+            return true;
+          } catch (error) {
+            return 'Invalid directory or insufficient permissions.';
+          }
+        },
+      };
+
+      const { templatePath: customTemplatePath } = await inquirer.prompt(
+        templatePathPrompt,
+      );
+      templatePath = path.resolve(customTemplatePath);
+    }
+
     switch (command) {
       case 'empty':
-        await generateEmptyCrud(entity);
+        await generateEmptyCrud(entity, templatePath);
         console.log('Empty CRUD generated successfully for entity:', entity);
         break;
       case 'minimal':
-        await generateMinimalCrud(entity);
+        await generateMinimalCrud(entity, templatePath);
         console.log('Minimal CRUD generated successfully for entity:', entity);
         break;
       default:
