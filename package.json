@@ -20,6 +20,10 @@
     "prepush": "npm run format:fix && npm run lint:check && npm run format:check",
     "prepare": "husky install"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fadhlaouir/express-node-starter.git"
+  },
   "keywords": [
     "node.js",
     "express.js",
