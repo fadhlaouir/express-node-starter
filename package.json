@@ -5,6 +5,9 @@
   "author": "@Raed Fadhlaoui <raed.fadhlaoui@hotmail.com>",
   "description": "Express, MongoDB, Firebase, and Swagger for API documentation starter for building RESTful APIs",
   "license": "MIT",
+  "bin": {
+    "express-node-starter": "./cli/index.js"
+  },
   "scripts": {
     "start": "NODE_ENV=production && node server.js",
     "develop": "SET NODE_ENV=development && nodemon server.js",
@@ -23,9 +26,6 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/fadhlaouir/express-node-starter.git"
-  },
-  "bin": {
-    "express-node-starter": "./cli/index.js"
   },
   "keywords": [
     "node.js",
