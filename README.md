@@ -9,6 +9,23 @@
 
 This project provides a robust API skeleton written in JavaScript ES6, suitable for any project. It offers features such as authentication, authorization, JWT tokens, role management, CRUD operations, email notifications, and more. Additionally, it automates the generation of CRUD (Create, Read, Update, Delete) operations for entities within a MongoDB database, streamlining the development process for Node.js applications built on top of Express.js.
 
+## Table of Contents
+
+- [Getting Started](#getting-started)
+- [Features](#features)
+- [Software Requirements](#software-requirements)
+- [Engines](#engines)
+- [How to Install](#how-to-install)
+- [Setting up Environments](#setting-up-environments)
+- [Project Structure](#project-structure)
+- [How to Run](#how-to-run)
+- [CLI Commands](#cli-commands)
+- [Linting and Formatting](#linting-and-formatting)
+- [Bugs or Improvements](#bugs-or-improvements)
+- [License](#license)
+- [Credits](#credits)
+- [Support](#support)
+
 ## Getting started
 
 This is a basic API skeleton written in JavaScript ES6.
@@ -67,7 +84,7 @@ cd express-node-starter
 npm install
 ```
 
-### Setting up environments
+## Setting up environments
 
 1.  You will find a file named `.env.example` on root directory of project.
 2.  Create a new file by copying and pasting the file and then renaming it to just `.env`
@@ -146,7 +163,7 @@ If you need to add more routes to the project just create a new file in `src/rou
 
 If you need to add more controllers to the project just create a new file in `src/controllers/` and use them in the routes.
 
-### Using the CLI to generate CRUD operations
+## Using the CLI to generate CRUD operations
 
 1. Navigate to the project directory.
 2. Run the following command:
@@ -157,7 +174,7 @@ npm run generate-crud
 
 Follow the prompts to select the CRUD type (empty or minimal) and provide the entity name. The tool will generate the necessary files for the CRUD operations based on your selection.
 
-## ESLint
+## Linting and Formatting
 
 ### Running Eslint
 
