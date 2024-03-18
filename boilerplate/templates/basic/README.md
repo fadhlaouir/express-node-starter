@@ -105,34 +105,33 @@ npm install
 │   ├── pre-commit
 │   └── pre-push
 ├── boilerplate
-│   ├── cli
-│   │   ├── _
-│   │   │   ├── deleteCrud.js
-│   │   │   ├── generateEmptyCrud.js
-│   │   │   ├── generateMinimalCrud.js
-│   │   │   └── helpers.js
-│   │   ├── crudOperation.js
-│   │   ├── index.js
-│   │   └── README.md
-│   └── templates
-│       └── basic
-│           ├── src
-│           │   ├── controllers
-│           │   │   ├── auth.controller.js
-│           │   │   └── user.controller.js
-│           │   ├── middlewares
-│           │   │   ├── multer.js
-│           │   │   └── verify-token.js
-│           │   ├── models
-│           │   │   └── UserModel.js
-│           │   └── swagger.js
-│           ├── uploads
-│           │   └── images.*
-│           ├── .eslintrc.json
-│           ├── .gitignore
-│           ├── .prettierignore.json
-│           ├── .prettierrc.json
-│           └── README.md
+│   ├── _
+│   │   ├── deleteCrud.js
+│   │   ├── generateEmptyCrud.js
+│   │   ├── generateMinimalCrud.js
+│   │   └── helpers.js
+│   ├── crudOperation.js
+│   ├── index.js
+│   └── README.md
+├── src
+│   ├── controllers
+│   │   ├── auth.controller.js
+│   │   └── user.controller.js
+│   ├── middlewares
+│   │   ├── multer.js
+│   │   └── verify-token.js
+│   ├── models
+│   │   └── UserModel.js
+│   ├── routes
+│   │   ├── auth.route.js
+│   │   └── user.route.js
+│   ├── template
+│   │   └── userAccountEmailTemplates.js
+│   ├── utils
+│   │   └── helpers.js
+│   └── swagger.js
+├── uploads
+│   └── images.*
 ├── .commitlintrc.json
 ├── .editorconfig
 ├── .env
@@ -147,7 +146,6 @@ npm install
 ├── package.json
 ├── README.md
 └── server.js
-
 ```
 
 ## How to run
