@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.8.0](https://github.com/fadhlaouir/express-node-starter/compare/v1.7.0...v1.8.0) (2024-03-18)
+
+
+### Features
+
+* Implement npx to create-express-node-starter ([1535532](https://github.com/fadhlaouir/express-node-starter/commit/1535532230f118f96140d4d5e7f321c689793034))
+
+
+### Bug Fixes
+
+* Fix nodejs.yml file :construction_worker: ([a24e751](https://github.com/fadhlaouir/express-node-starter/commit/a24e751d61fc6107140bad017f9ab1cead4a3300))
+
 ## [1.7.0](https://github.com/fadhlaouir/express-node-starter/compare/v1.6.0...v1.7.0) (2024-03-18)
 
 
