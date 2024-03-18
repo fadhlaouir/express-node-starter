@@ -104,14 +104,13 @@ npm install
 │   │   └── husky.sh
 │   ├── pre-commit
 │   └── pre-push
-├── bin
-│   └── cli.js
-├── cli
+├── boilerplate
 │   ├── _
 │   │   ├── deleteCrud.js
 │   │   ├── generateEmptyCrud.js
 │   │   ├── generateMinimalCrud.js
 │   │   └── helpers.js
+│   ├── crudOperation.js
 │   ├── index.js
 │   └── README.md
 ├── src

@@ -6,13 +6,14 @@
   "description": "Express, MongoDB, Firebase, and Swagger for API documentation starter for building RESTful APIs",
   "license": "MIT",
   "bin": {
-    "express-node-starter": "./cli/index.js"
+    "express-node-starter": "./boilerplate/crudOperation.js",
+    "create-express-node-starter": "./boilerplate/index.js"
   },
   "scripts": {
     "start": "NODE_ENV=production && node server.js",
     "develop": "SET NODE_ENV=development && nodemon server.js",
     "develop:mac": "NODE_ENV=development && nodemon server.js",
-    "crud-operation": "node cli/index.js generate",
+    "crud-operation": "node boilerplate/crudOperation.js generate",
     "lint:check": "eslint --ext .js,.jsx,.ts,.tsx .",
     "format:check": "prettier --check .",
     "lint:fix": "eslint --ext .js,.jsx,.ts,.tsx --fix .",
