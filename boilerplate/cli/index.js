@@ -5,7 +5,8 @@ const fs = require('fs');
 const path = require('path');
 const inquirer = require('inquirer');
 
-const templatesDir = path.join(__dirname, 'templates');
+const boilerplateDir = path.join(__dirname, '..');
+const templatesDir = path.join(boilerplateDir, 'templates');
 
 async function main() {
   try {
@@ -65,7 +66,8 @@ async function promptTemplateSelection() {
 
 function copyTemplate(template, projectDirectory) {
   const templatePath = path.join(templatesDir, template);
-  exec(`cp -r ${templatePath} ${projectDirectory}`);
+  const destinationPath = path.join(process.cwd(), projectDirectory);
+  exec(`cp -r ${templatePath}/* ${destinationPath}`);
 }
 
 async function installDependencies(projectDirectory) {
