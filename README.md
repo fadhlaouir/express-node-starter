@@ -99,14 +99,21 @@ npm install
 ```sh
 .
 ├── .husky
+│   ├── _
+│   │   ├── .gitignore
+│   │   └── husky.sh
+│   ├── pre-commit
+│   └── pre-push
+├── bin
+│   └── cli.js
 ├── cli
 │   ├── _
 │   │   ├── deleteCrud.js
 │   │   ├── generateEmptyCrud.js
 │   │   ├── generateMinimalCrud.js
 │   │   └── helpers.js
-│   ├── generateCrud.js
-│   └── index.js
+│   ├── index.js
+│   └── README.md
 ├── src
 │   ├── controllers
 │   │   ├── auth.controller.js
@@ -126,11 +133,20 @@ npm install
 │   └── swagger.js
 ├── uploads
 │   └── images.*
+├── .commitlintrc.json
+├── .editorconfig
+├── .env
 ├── .env.example
-├── .gitignore
+├── .eslintignore.json
 ├── .eslintrc.json
-├── server.js
-└── package.json
+├── .gitignore
+├── .prettierignore.json
+├── .prettierrc.json
+├── CHANGELOG.md
+├── LICENSE
+├── package.json
+├── README.md
+└── server.js
 ```
 
 ## How to run
