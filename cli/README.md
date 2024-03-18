@@ -11,7 +11,7 @@ To generate or delete CRUD operations, you can use the CLI provided in this proj
 To run the CLI, execute the following command:
 
 ```bash
-npm run crud-operation
+npm run crud:operation
 ```
 
 Selecting Action
@@ -40,7 +40,7 @@ Here's an example of how you can use the CLI to generate CRUD operations:
 Run the CLI:
 
 ```bash
-npm run crud-operation
+npm run crud:operation
 ```
 
 1. Select the action "Generate CRUD."
@@ -52,4 +52,4 @@ npm run crud-operation
 
 Ensure that you have the necessary permissions and dependencies installed before running the CLI. Additionally, make sure to review the generated CRUD files and modify them according to your application's requirements.
 
-This documentation provides a clear overview of how to use the CLI to generate or delete CRUD operations in the project. Adjustments have been made to reflect the changes made in this version, including the implementation of delete CRUD and the change from `npm run generate-crud` to `npm run crud-operation`.
+This documentation provides a clear overview of how to use the CLI to generate or delete CRUD operations in the project. Adjustments have been made to reflect the changes made in this version, including the implementation of delete CRUD and the change from `npm run generate-crud` to `npm run crud:operation`.
