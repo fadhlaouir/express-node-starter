@@ -1,6 +1,6 @@
 {
   "name": "express-node-starter",
-  "version": "1.8.0",
+  "version": "1.9.0",
   "main": "server.js",
   "author": "@Raed Fadhlaoui <raed.fadhlaoui@hotmail.com>",
   "description": "Express, MongoDB, Firebase, and Swagger for API documentation starter for building RESTful APIs",
