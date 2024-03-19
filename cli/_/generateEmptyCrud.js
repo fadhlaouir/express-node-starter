@@ -51,17 +51,33 @@ async function generateEmptyCrud(entity) {
 /* -------------------------------------------------------------------------- */
 /**
  * Generates the template for the model file.
+ * This function generates a basic Mongoose schema and model template
+ * for a given entity.
  * @param {string} entity - The name of the entity.
  * @returns {string} - The model template.
  */
 function generateModelTemplate(entity) {
+  // Template for the model file
   return `
     const mongoose = require('mongoose');
 
+    /**
+     * Schema definition for ${entity}.
+     * This schema defines the structure of the ${entity} entity in the database.
+     */
     const ${entity}Schema = new mongoose.Schema({
       // Define schema fields here
+      fieldName: {
+        type: String,
+        required: true, // Example of a required field
+      }
     });
 
+    /**
+     * Model for ${entity}.
+     * This model represents the ${entity} entity in the database and provides
+     * methods for interacting with ${entity} documents.
+     */
     module.exports = mongoose.model('${entity}', ${entity}Schema);
   `;
 }
@@ -71,6 +87,8 @@ function generateModelTemplate(entity) {
 /* -------------------------------------------------------------------------- */
 /**
  * Generates the template for the controller file.
+ * This function generates a basic CRUD (Create, Read, Update, Delete) operations template
+ * for a given entity.
  * @param {string} entity - The name of the entity.
  * @param {string} originalEntity - The original, uncapitalized entity name.
  * @returns {string} - The controller template.
@@ -79,23 +97,47 @@ function generateControllerTemplate(entity, originalEntity) {
   return `
     const ${entity} = require('../models/${originalEntity}.model');
 
-    // Create CRUD operations
+    /**
+     * Creates a new ${entity}.
+     * @param {Object} req - Express request object.
+     * @param {Object} res - Express response object.
+     * @returns {Promise<void>} - Promise representing the operation completion.
+     */
     async function create${entity}(req, res) {
       // Implement create operation
     }
 
+    /**
+     * Retrieves ${entity} by ID.
+     * @param {Object} req - Express request object.
+     * @param {Object} res - Express response object.
+     * @returns {Promise<void>} - Promise representing the operation completion.
+     */
     async function get${entity}(req, res) {
       // Implement read operation
     }
 
+    /**
+     * Updates an existing ${entity} by ID.
+     * @param {Object} req - Express request object.
+     * @param {Object} res - Express response object.
+     * @returns {Promise<void>} - Promise representing the operation completion.
+     */
     async function update${entity}(req, res) {
       // Implement update operation
     }
 
+    /**
+     * Deletes an existing ${entity} by ID.
+     * @param {Object} req - Express request object.
+     * @param {Object} res - Express response object.
+     * @returns {Promise<void>} - Promise representing the operation completion.
+     */
     async function delete${entity}(req, res) {
       // Implement delete operation
     }
 
+    // Export controller functions
     module.exports = {
       create${entity},
       get${entity},
@@ -110,22 +152,35 @@ function generateControllerTemplate(entity, originalEntity) {
 /* -------------------------------------------------------------------------- */
 /**
  * Generates the template for the route file.
+ * This function generates routes for CRUD operations related to a specific entity.
  * @param {string} entity - The name of the entity.
  * @param {string} originalEntity - The original, uncapitalized entity name.
  * @returns {string} - The route template.
  */
 function generateRouteTemplate(entity, originalEntity) {
+  // Template for the route file
   return `
     const express = require('express');
     const router = express.Router();
     const ${entity}Controller = require('../controllers/${originalEntity}.controller');
 
-    // Define routes for ${entity} CRUD operations
+    /**
+     * Routes for ${entity} CRUD operations.
+     */
+
+    // POST - Create a new ${entity}
     router.post('/${originalEntity}', ${entity}Controller.create${entity});
+
+    // GET - Retrieve all ${entity}s
     router.get('/${originalEntity}s', ${entity}Controller.get${entity});
+
+    // PUT - Update a ${entity} by ID
     router.put('/${originalEntity}s/:id', ${entity}Controller.update${entity});
+
+    // DELETE - Delete a ${entity} by ID
     router.delete('/${originalEntity}s/:id', ${entity}Controller.delete${entity});
 
+    // Export the router
     module.exports = router;
   `;
 }
