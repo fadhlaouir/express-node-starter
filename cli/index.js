@@ -4,12 +4,19 @@
 /* -------------------------------------------------------------------------- */
 // Required packages
 const inquirer = require('inquirer'); // For prompting user input
+const util = require('util');
+const exec = util.promisify(require('child_process').exec); // For executing shell commands
 
 // Local helpers and functions
 const { generateEmptyCrud } = require('./_/generateEmptyCrud'); // Function to generate empty CRUD
 const { generateMinimalCrud } = require('./_/generateMinimalCrud'); // Function to generate minimal CRUD
 const { deleteCrud } = require('./_/deleteCrud'); // Function to delete CRUD
 const { isEntityExists } = require('./_/helpers'); // Function to check if entity already exists
+
+/* -------------------------------------------------------------------------- */
+/*                                  CONSTANTS                                 */
+/* -------------------------------------------------------------------------- */
+const LOADING_EMOJI = '⏳'; // Loading emoji
 
 /* -------------------------------------------------------------------------- */
 /*                                   MAIN                                     */
@@ -33,9 +40,11 @@ async function main() {
 
     switch (action) {
       case 'Generate CRUD':
+        console.log(`${LOADING_EMOJI} Generating CRUD...`);
         await generateCrud();
         break;
       case 'Delete CRUD':
+        console.log(`${LOADING_EMOJI} Deleting CRUD...`);
         await deleteCrudAction();
         break;
       case 'Exit':
@@ -94,20 +103,25 @@ async function generateCrud() {
     switch (command) {
       case 'empty':
         await generateEmptyCrud(entity);
-        console.log('Empty CRUD generated successfully for entity:', entity);
-        console.log('Exiting...');
-        process.exit(0);
+        console.log('✅ Empty CRUD generated successfully for entity:', entity);
         break;
       case 'minimal':
         await generateMinimalCrud(entity);
-        console.log('Minimal CRUD generated successfully for entity:', entity);
-        console.log('Exiting...');
-        process.exit(0);
+        console.log(
+          '✅ Minimal CRUD generated successfully for entity:',
+          entity,
+        );
         break;
       default:
         console.log('Invalid command:', command);
         process.exit(1);
     }
+
+    // Run 'npm run format:fix' after CRUD operations are performed
+    await exec('npm run format:fix');
+    console.log('✅ Formatting fixed.');
+    console.log('Exiting...');
+    process.exit(0);
   } catch (error) {
     console.error('An error occurred during CRUD generation:', error);
     process.exit(1);
@@ -136,6 +150,13 @@ async function deleteCrudAction() {
 
     const { entity } = await inquirer.prompt(entityPrompt);
     await deleteCrud(entity);
+    console.log('✅ CRUD for entity', entity, 'deleted successfully.');
+
+    // Run 'npm run format:fix' after CRUD operations are performed
+    await exec('npm run format:fix');
+    console.log('✅ Formatting fixed.');
+    console.log('Exiting...');
+    process.exit(0);
   } catch (error) {
     console.error('An error occurred during CRUD deletion:', error);
     process.exit(1);
