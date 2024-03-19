@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.9.0](https://github.com/fadhlaouir/express-node-starter/compare/v1.8.0...v1.9.0) (2024-03-19)
+
+
+### Features
+
+* Enhace CLI tool, Added emojis, loading indicators, and formatting fix integration :tada: ([990c953](https://github.com/fadhlaouir/express-node-starter/commit/990c953ad9699e46aa99fb650faca57f6888091b))
+* Improve generate empty crud with documentations :tada: ([6fa4c91](https://github.com/fadhlaouir/express-node-starter/commit/6fa4c91d1881f96841d141affcd281ab4dd805e9))
+* Improve generate minimal crud ([91cf310](https://github.com/fadhlaouir/express-node-starter/commit/91cf310de996bb7c443a0278564f5b56cecae793))
+* Update documentation for empty crud ([3106a8c](https://github.com/fadhlaouir/express-node-starter/commit/3106a8c4e9ed899b5f9a713ee71004c3fceee766))
+
 ## [1.8.0](https://github.com/fadhlaouir/express-node-starter/compare/v1.7.0...v1.8.0) (2024-03-18)
 
 
