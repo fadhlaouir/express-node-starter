@@ -59,8 +59,15 @@ async function generateEmptyCrud(entity) {
 function generateModelTemplate(entity) {
   // Template for the model file
   return `
+  /* -------------------------------------------------------------------------- */
+  /*                                DEPENDENCIES                                */
+  /* -------------------------------------------------------------------------- */
+  // packages
     const mongoose = require('mongoose');
 
+/* -------------------------------------------------------------------------- */
+/*                              SCHEMA DEFINITION                             */
+/* -------------------------------------------------------------------------- */
     /**
      * Schema definition for ${entity}.
      * This schema defines the structure of the ${entity} entity in the database.
@@ -95,8 +102,15 @@ function generateModelTemplate(entity) {
  */
 function generateControllerTemplate(entity, originalEntity) {
   return `
+  /* -------------------------------------------------------------------------- */
+  /*                                DEPENDENCIES                                */
+  /* -------------------------------------------------------------------------- */
+  // local models
     const ${entity} = require('../models/${originalEntity}.model');
 
+    /* -------------------------------------------------------------------------- */
+    /*                            CONTROLLER FUNCTIONS                            */
+    /* -------------------------------------------------------------------------- */
     /**
      * Creates a new ${entity}.
      * @param {Object} req - Express request object.
@@ -160,10 +174,19 @@ function generateControllerTemplate(entity, originalEntity) {
 function generateRouteTemplate(entity, originalEntity) {
   // Template for the route file
   return `
+  /* -------------------------------------------------------------------------- */
+  /*                                DEPENDENCIES                                */
+  /* -------------------------------------------------------------------------- */
+  // packages
     const express = require('express');
     const router = express.Router();
+
+    // local controllers
     const ${entity}Controller = require('../controllers/${originalEntity}.controller');
 
+/* -------------------------------------------------------------------------- */
+/*                                   ROUTES                                   */
+/* -------------------------------------------------------------------------- */
     /**
      * Routes for ${entity} CRUD operations.
      */
