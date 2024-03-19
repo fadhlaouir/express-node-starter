@@ -150,11 +150,7 @@ async function deleteCrudAction() {
 
     const { entity } = await inquirer.prompt(entityPrompt);
     await deleteCrud(entity);
-    console.log('✅ CRUD for entity', entity, 'deleted successfully.');
 
-    // Run 'npm run format:fix' after CRUD operations are performed
-    await exec('npm run format:fix');
-    console.log('✅ Formatting fixed.');
     console.log('Exiting...');
     process.exit(0);
   } catch (error) {

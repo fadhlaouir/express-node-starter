@@ -1,5 +1,11 @@
+/* -------------------------------------------------------------------------- */
+/*                                DEPENDENCIES                                */
+/* -------------------------------------------------------------------------- */
+// Required packages
 const fs = require('fs').promises;
 const path = require('path');
+const util = require('util');
+const exec = util.promisify(require('child_process').exec); // For executing shell commands
 const inquirer = require('inquirer');
 
 /**
@@ -125,6 +131,9 @@ async function deleteCrud(entity) {
     await fs.writeFile(serverFilePath, serverFileContent);
 
     console.log('CRUD deleted successfully for entity:', entity);
+    // Run 'npm run format:fix' after CRUD operations are performed
+    await exec('npm run format:fix');
+    console.log('✅ Formatting fixed.');
   } catch (error) {
     console.error('An error occurred while deleting CRUD:', error);
     throw error;
