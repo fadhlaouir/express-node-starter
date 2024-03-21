@@ -1,11 +1,9 @@
-# Express Node Starter: Empowering Your API Development Journey
+# REST API Developed with Node.js, Express, MongoDB, Multer and nodemailer Boilerplate
 
 [![Author](http://img.shields.io/badge/author-@rfadhlaoui-blue.svg)](https://tn.linkedin.com/in/fadhlaouiraed)
 [![GitHub license](https://img.shields.io/github/license/maitraysuthar/rest-api-nodejs-mongodb.svg)](https://github.com/fadhlaouir/express-node-starter/blob/main/LICENSE)
 [![Downloads](https://img.shields.io/npm/dt/express-node-starter.svg)](https://www.npmjs.com/package/express-node-starter)
 
-
-**REST API Developed with Node.js, Express, MongoDB, Multer and nodemailer**
 
 ## Overview
 
