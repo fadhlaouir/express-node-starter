@@ -112,6 +112,21 @@ npm install
 │   │   └── helpers.js
 │   ├── index.js
 │   └── README.md
+├── src
+│   ├── controllers
+│   │   ├── auth.controller.js
+│   │   └── user.controller.js
+│   ├── middlewares
+│   │   ├── multer.js
+│   │   └── verify-token.js
+│   ├── models
+│   │   └── user.model.js
+│   ├── routes
+│   │   ├── auth.route.js
+│   │   └── user.route.js
+│   ├── utils
+│   │   └── helpers.js
+│   └── swagger.json
 ├── .commitlintrc.json
 ├── .editorconfig
 ├── .env
