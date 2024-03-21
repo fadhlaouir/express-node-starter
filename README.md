@@ -5,7 +5,7 @@
 [![Downloads](https://img.shields.io/npm/dt/express-node-starter.svg)](https://www.npmjs.com/package/express-node-starter)
 
 
-**REST API Developed with Node.js, Express, MongoDB**
+**REST API Developed with Node.js, Express, MongoDB, Multer and nodemailer**
 
 ## Overview
 
