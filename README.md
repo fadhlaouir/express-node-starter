@@ -4,7 +4,6 @@
 [![GitHub license](https://img.shields.io/github/license/maitraysuthar/rest-api-nodejs-mongodb.svg)](https://github.com/fadhlaouir/express-node-starter/blob/main/LICENSE)
 [![Downloads](https://img.shields.io/npm/dt/express-node-starter.svg)](https://www.npmjs.com/package/express-node-starter)
 
-
 **REST API Developed with Node.js, Express, MongoDB**
 
 ## Overview
@@ -42,6 +41,7 @@ API Documentation [Swagger]
 - JWT Tokens, make requests with a token after login with `Authorization` header with value `Bearer yourToken` where `yourToken` will be returned in the Login response.
 - Role Manage
 - Update Profile/Password User Account
+- Upload Image with multer
 - Reset Password Mail using `nodemailer`
 - Pre-defined response structures with proper status codes.
 - Included CORS.
@@ -114,6 +114,21 @@ npm install
 │   │   └── helpers.js
 │   ├── index.js
 │   └── README.md
+├── src
+│   ├── controllers
+│   │   ├── auth.controller.js
+│   │   └── user.controller.js
+│   ├── middlewares
+│   │   ├── multer.js
+│   │   └── verify-token.js
+│   ├── models
+│   │   └── user.model.js
+│   ├── routes
+│   │   ├── auth.route.js
+│   │   └── user.route.js
+│   ├── utils
+│   │   └── helpers.js
+│   └── swagger.json
 ├── .commitlintrc.json
 ├── .editorconfig
 ├── .env
