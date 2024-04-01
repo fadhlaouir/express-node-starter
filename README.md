@@ -4,7 +4,6 @@
 [![GitHub license](https://img.shields.io/github/license/maitraysuthar/rest-api-nodejs-mongodb.svg)](https://github.com/fadhlaouir/express-node-starter/blob/main/LICENSE)
 [![Downloads](https://img.shields.io/npm/dt/express-node-starter.svg)](https://www.npmjs.com/package/express-node-starter)
 
-
 ## Overview
 
 This project provides a robust API skeleton written in JavaScript ES6, suitable for any project. It offers features such as authentication, authorization, JWT tokens, role management, CRUD operations, email notifications, and more. Additionally, it automates the generation of CRUD (Create, Read, Update, Delete) operations for entities within a MongoDB database, streamlining the development process for Node.js applications built on top of Express.js.
@@ -125,6 +124,8 @@ npm install
 │   ├── routes
 │   │   ├── auth.route.js
 │   │   └── user.route.js
+│   ├── template
+│   │   └── userAccountEmailTemplates.js
 │   ├── utils
 │   │   └── helpers.js
 │   └── swagger.json
