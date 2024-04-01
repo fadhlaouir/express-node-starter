@@ -236,18 +236,9 @@ This project is open-sourced software licensed under the MIT License. See the LI
 - Raed FADHLAOUI: [Author Email](mailto:raed.fadhlaoui@hotmail.com)
 - Project Repository: [GitHub Repository](https://github.com/fadhlaouir/express-node-starter)
 
-## Support
+# Sponsor on Buy Me a Coffee
 
-For any inquiries or issues, please contact [Support Email](raed.fadhlaoui@hotmail.com).
+If you find this project valuable, consider supporting us through Buy Me a Coffee. Your sponsorship helps us maintain and improve the project, ensuring better features, updates, and support for the community.
 
-- **Optimization**: Improved readability by reorganizing the content and ensuring consistency in formatting.
-- **Documentation Update**: Reflects the changes made to the CLI commands for generating and deleting CRUD operations.
-- **Bug Fixes**: Resolved issues related to the CLI commands and the project structure.
-- **Feature Addition**: Added support for generating empty and minimal CRUD operations using the CLI.
-- **Code Quality**: Improved code quality by adding linting and formatting tools.
-- **Security**: Updated dependencies to address security vulnerabilities.
-- **Testing**: Added support for running tests using Jest.
-- **Performance**: Improved performance by optimizing the code and removing unnecessary dependencies.
-- **Refactoring**: Refactored the code to improve readability and maintainability.
-- **Dependency Update**: Updated dependencies to their latest versions.
-- **Configuration**: Updated the configuration files to reflect the changes made to the project structure.
+<a href="https://www.buymeacoffee.com/fadhlaouir" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
+
