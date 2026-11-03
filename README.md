@@ -1,7 +1,7 @@
 # REST API Developed with Node.js, Express, MongoDB, Multer and nodemailer Boilerplate
 
 [![Author](http://img.shields.io/badge/author-@rfadhlaoui-blue.svg)](https://tn.linkedin.com/in/fadhlaouiraed)
-[![GitHub license](https://img.shields.io/github/license/maitraysuthar/rest-api-nodejs-mongodb.svg)](https://github.com/fadhlaouir/express-node-starter/blob/main/LICENSE)
+[![GitHub license](https://img.shields.io/github/license/fadhlaouir/express-node-starter.svg)](https://github.com/fadhlaouir/express-node-starter/blob/main/LICENSE)
 [![Downloads](https://img.shields.io/npm/dt/express-node-starter.svg)](https://www.npmjs.com/package/express-node-starter)
 
 ## Overview
@@ -227,6 +227,8 @@ You can set custom rules for eslint in `.eslintrc.json` file, Added at project r
 
 Every project needs improvements, Feel free to report any bugs or improvements. Pull requests are always welcome.
 
+Found a security issue? Please don't open a public issue: see the [security policy](SECURITY.md).
+
 ## License
 
 This project is open-sourced software licensed under the MIT License. See the LICENSE file for more information.
@@ -241,4 +243,3 @@ This project is open-sourced software licensed under the MIT License. See the LI
 If you find this project valuable, consider supporting us through Buy Me a Coffee. Your sponsorship helps us maintain and improve the project, ensuring better features, updates, and support for the community.
 
 <a href="https://www.buymeacoffee.com/fadhlaouir" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
-

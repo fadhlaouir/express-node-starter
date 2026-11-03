@@ -1,0 +1,31 @@
+name: 🐛 Bug report
+description: Something in the starter or the CRUD generator doesn't work.
+labels: [bug]
+body:
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: What you ran or requested (route, payload), and what went wrong. Paste the full error output.
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect?
+    validations:
+      required: true
+  - type: input
+    id: versions
+    attributes:
+      label: Versions
+      description: Output of `node -v && npm -v`, your MongoDB version, and the commit or release you started from.
+      placeholder: 'v22.11.0, 10.9.0, MongoDB 7.0, v1.11.0'
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: Operating system
+      placeholder: Windows 11, macOS 15, Ubuntu 24.04…
