@@ -31,6 +31,12 @@ async function generateMinimalCrud(entity, { minimal = true } = {}) {
     ),
   );
 
+  // A new project may not have a models or controllers folder yet.
+  await Promise.all(
+    Object.values(files).map((file) =>
+      fs.mkdir(path.dirname(file), { recursive: true }),
+    ),
+  );
   await Promise.all([
     fs.writeFile(files.model, templates.model(Entity, minimal), { flag: 'wx' }),
     fs.writeFile(
