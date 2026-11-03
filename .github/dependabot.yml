@@ -8,7 +8,7 @@ updates:
       minor-and-patch:
         update-types: [minor, patch]
     # Major versions need code changes: upgrade them on purpose, not from a bot.
-    # Security fixes still arrive, whatever their version.
+    # Vulnerabilities are still reported in the Security tab.
     ignore:
       - dependency-name: '*'
         update-types: [version-update:semver-major]
