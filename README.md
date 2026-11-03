@@ -1,12 +1,25 @@
-# Express Node Starter
+<h1 align="center">Express Node Starter</h1>
 
-A secure REST API starter with Express 5, MongoDB and JWT authentication. Clone it, fill in `.env`, and start building your own endpoints, or generate them with the built-in CRUD CLI.
+<p align="center">
+  A secure REST API starter with Express 5, MongoDB and JWT authentication.<br>
+  Sign-up, roles, password reset, uploads, API docs, tests and Docker, ready to build on.
+</p>
 
-[![CI](https://github.com/fadhlaouir/express-node-starter/actions/workflows/ci.yml/badge.svg)](https://github.com/fadhlaouir/express-node-starter/actions/workflows/ci.yml)
-[![GitHub license](https://img.shields.io/github/license/fadhlaouir/express-node-starter.svg)](https://github.com/fadhlaouir/express-node-starter/blob/main/LICENSE)
-[![Author](http://img.shields.io/badge/author-@rfadhlaoui-blue.svg)](https://tn.linkedin.com/in/fadhlaouiraed)
+<p align="center">
+  <a href="https://github.com/fadhlaouir/express-node-starter/actions/workflows/ci.yml"><img src="https://github.com/fadhlaouir/express-node-starter/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <a href="https://github.com/fadhlaouir/express-node-starter/releases/latest"><img src="https://img.shields.io/github/v/release/fadhlaouir/express-node-starter" alt="Latest release"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License: MIT"></a>
+</p>
 
-> Want a fresh project in one command? Use [create-express-node-starter](https://github.com/fadhlaouir/create-express-node-starter): `npx create-express-node-starter`.
+```bash
+npx create-express-node-starter my-api --template auth
+```
+
+<p align="center">
+  Creates a new project from this starter with <a href="https://github.com/fadhlaouir/create-express-node-starter">create-express-node-starter</a>, or clone it below.
+</p>
+
+---
 
 ## Table of Contents
 
@@ -35,7 +48,7 @@ A secure REST API starter with Express 5, MongoDB and JWT authentication. Clone 
 - **API docs:** Swagger UI at `/api-docs/`, from an OpenAPI 3 spec.
 - **Health check** at `/health`, and graceful shutdown.
 - **CRUD generator:** `npm run crud:operation -- generate product` writes a working model, controller and routes.
-- **Tests:** 29 integration tests with an in-memory MongoDB; no database to install.
+- **Tests:** 30 integration tests with an in-memory MongoDB; no database to install.
 - **Tooling:** ESLint, Prettier, Husky and lint-staged, conventional-commit releases, Docker and GitHub Actions CI.
 
 ## Requirements
@@ -203,15 +216,6 @@ Found a security issue? Please don't open a public issue: see the [security poli
 
 ## License
 
-This project is open-sourced software licensed under the [MIT License](LICENSE).
+[MIT](LICENSE) © Raed Fadhlaoui
 
-## Credits
-
-- Raed FADHLAOUI: [Author Email](mailto:raed.fadhlaoui@hotmail.com)
-- Project Repository: [GitHub Repository](https://github.com/fadhlaouir/express-node-starter)
-
-# Sponsor on Buy Me a Coffee
-
-If you find this project valuable, consider supporting us through Buy Me a Coffee. Your sponsorship helps us maintain and improve the project, ensuring better features, updates, and support for the community.
-
-<a href="https://www.buymeacoffee.com/fadhlaouir" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
+If this project saves you time, you can [buy me a coffee](https://www.buymeacoffee.com/fadhlaouir).
