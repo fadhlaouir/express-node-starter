@@ -1,6 +1,18 @@
 # Changelog
 
-All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
+
+## [2.0.0](https://github.com/fadhlaouir/express-node-starter/compare/v1.11.0...v2.0.0) (2026-11-03)
+
+### ⚠ BREAKING CHANGES
+
+* requires Node.js 22.13+, Express 5 and Mongoose 9.
+  `npm run develop` is now `npm run dev`, failed sign-ins return 401,
+  and dotenv, nodemon and swagger-ui-express are no longer used.
+
+### Features
+
+* rebuild on Express 5 with security fixes, tests and Docker ([817e008](https://github.com/fadhlaouir/express-node-starter/commit/817e0085f5e514455dd835212f7186809379dacb))
 
 ## [1.11.0](https://github.com/fadhlaouir/express-node-starter/compare/v1.10.0...v1.11.0) (2024-03-19)
 
