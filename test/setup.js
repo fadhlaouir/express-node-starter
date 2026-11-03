@@ -11,6 +11,7 @@ async function setup() {
   process.env.DEV_DATABASE = mongo.getUri();
   process.env.SECRET = 'test-secret-that-is-long-enough-for-hs256-signing';
   process.env.AUTH_RATE_LIMIT = '1000';
+  process.env.API_RATE_LIMIT = '1000';
   process.env.DEVELOPMENT_CLIENT_URL = 'http://client.test';
 
   const { connectDatabase } = require('../src/config/database');

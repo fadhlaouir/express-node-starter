@@ -86,6 +86,16 @@ test('API docs load Swagger UI with integrity hashes and serve the spec', async 
   assert.equal(spec.body.openapi, '3.0.3');
 });
 
+test('the docs redirect always goes to /api-docs/, even with a query string', async () => {
+  const res = await agent.get('/api-docs?tab=auth').expect(301);
+  assert.equal(res.headers.location, '/api-docs/');
+});
+
+test('API routes send rate limit headers', async () => {
+  const res = await agent.get('/v1/api/nope');
+  assert.match(res.headers['ratelimit-policy'], /q=\d+; w=900/);
+});
+
 test('unknown routes return a JSON 404', async () => {
   const res = await agent.get('/v1/api/nope').expect(404);
   assert.equal(res.body.success, false);

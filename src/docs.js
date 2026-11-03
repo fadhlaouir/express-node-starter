@@ -44,8 +44,10 @@ router.use(
 
 // GET /api-docs/ - Swagger UI
 router.get('/', (req, res) => {
-  if (!req.originalUrl.endsWith('/'))
-    return res.redirect(301, `${req.originalUrl}/`);
+  // Redirect to the mount path, never to the request URL: a query string
+  // would otherwise end up before the slash and loop.
+  if (!req.originalUrl.split('?')[0].endsWith('/'))
+    return res.redirect(301, `${req.baseUrl}/`);
   return res.type('html').send(page);
 });
 

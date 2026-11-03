@@ -11,6 +11,7 @@ const morgan = require('morgan');
 const { env } = require('./config/env');
 const { isDatabaseConnected } = require('./config/database');
 const { UPLOAD_DIR } = require('./middlewares/multer');
+const { apiLimiter } = require('./middlewares/rate-limit');
 const { notFound, errorHandler } = require('./middlewares/error-handler');
 const routes = require('./routes');
 const docs = require('./docs');
@@ -66,7 +67,7 @@ app.get('/health', (req, res) => {
 app.use('/api-docs', docs);
 
 // API routes
-app.use('/v1/api', routes);
+app.use('/v1/api', apiLimiter, routes);
 
 // Errors
 app.use(notFound);

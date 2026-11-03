@@ -44,11 +44,11 @@ npx create-express-node-starter my-api --template auth
 - **JWT tokens:** send `Authorization: Bearer <token>`; tokens hold only the user id and role.
 - **Users:** profile with photo upload, paginated list for staff, self-service delete.
 - **Uploads:** images only (JPEG, PNG, GIF, WebP), 5 MB maximum, stored under random names.
-- **Security by default:** Helmet headers, rate limits on auth routes, NoSQL-injection-safe input, hashed passwords and email codes. See [Security](#security).
+- **Security by default:** Helmet headers, rate limits on every API route and stricter ones on auth routes, NoSQL-injection-safe input, hashed passwords and email codes. See [Security](#security).
 - **API docs:** Swagger UI at `/api-docs/`, from an OpenAPI 3 spec.
 - **Health check** at `/health`, and graceful shutdown.
 - **CRUD generator:** `npm run crud:operation -- generate product` writes a working model, controller and routes.
-- **Tests:** 30 integration tests with an in-memory MongoDB; no database to install.
+- **Tests:** 32 integration tests with an in-memory MongoDB; no database to install.
 - **Tooling:** ESLint, Prettier, Husky and lint-staged, conventional-commit releases, Docker and GitHub Actions CI.
 
 ## Requirements
@@ -99,6 +99,7 @@ All of them are in [`.env.example`](.env.example). `npm start` and `npm run dev`
 | `PORT`                                                                                        | No (`5000`) | HTTP port                                                |
 | `DEVELOPMENT_CLIENT_URL` / `PRODUCTION_CLIENT_URL`                                            | For emails  | Your front end, used in confirmation and reset links     |
 | `CORS_ORIGIN`                                                                                 | No (`*`)    | Allowed origins, comma-separated                         |
+| `API_RATE_LIMIT`                                                                              | No (`300`)  | Requests per IP per 15 minutes on every API route        |
 | `AUTH_RATE_LIMIT`                                                                             | No (`20`)   | Requests per IP per 15 minutes on public auth routes     |
 | `MAILER_EMAIL_ID`, `MAILER_PASSWORD`, `MAILER_SERVICE_PROVIDER`, `HOST`, `PORT_SSL`, `SECURE` | For emails  | SMTP settings for nodemailer                             |
 
@@ -192,7 +193,7 @@ This starts the API on port 5000 and MongoDB 8, with uploads and data in Docker 
 - Request fields are checked as strings, so `{ "$ne": null }`-style query injection is rejected.
 - Sign-in and password-reset answers don't reveal which emails have accounts.
 - Uploads accept images only, get random file names, and are served from a folder that can't be escaped.
-- Public auth routes are rate limited, and Helmet sets security headers.
+- Every API route is rate limited (300 requests per IP per 15 minutes by default), public auth routes more strictly, and Helmet sets security headers.
 - Error responses never include stack traces or internal messages in production.
 
 Found a vulnerability? Please report it privately: see the [security policy](SECURITY.md).
