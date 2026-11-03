@@ -21,8 +21,8 @@ jobs:
       contents: read
       id-token: write # required for trusted publishing and provenance
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           # Trusted publishing needs npm 11.5.1 or later, which ships with Node.js 24.
           node-version: 24
