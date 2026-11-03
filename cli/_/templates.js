@@ -181,19 +181,23 @@ module.exports = {
 };
 
 /**
- * Router. Reading is public; creating, updating and deleting require a token.
+ * Router. Reading is public. In projects with authentication (a
+ * src/middlewares/verify-token.js file), creating, updating and deleting
+ * require a token.
  * @param {string} Entity - Capitalized name
  * @param {string} entity - Name as typed
+ * @param {boolean} protect - Require a token for writes
  */
-const route = (Entity, entity) => `${banner('Dependencies')}
+const route = (Entity, entity, protect) => {
+  const guard = protect ? 'verifyToken, ' : '';
+  return `${banner('Dependencies')}
 const router = require('express').Router();
-const verifyToken = require('../middlewares/verify-token');
-const ${entity}Controller = require('../controllers/${entity}.controller');
+${protect ? "const verifyToken = require('../middlewares/verify-token');\n" : ''}const ${entity}Controller = require('../controllers/${entity}.controller');
 
 ${banner(`${Entity} Route`)}
 
 // POST request - Create a ${entity}
-router.post('/${entity}s', verifyToken, ${entity}Controller.create${Entity});
+router.post('/${entity}s', ${guard}${entity}Controller.create${Entity});
 
 // GET request - List ${entity}s
 router.get('/${entity}s', ${entity}Controller.get${Entity}s);
@@ -202,12 +206,13 @@ router.get('/${entity}s', ${entity}Controller.get${Entity}s);
 router.get('/${entity}s/:id', ${entity}Controller.get${Entity}ById);
 
 // PUT request - Update a ${entity} by id
-router.put('/${entity}s/:id', verifyToken, ${entity}Controller.update${Entity});
+router.put('/${entity}s/:id', ${guard}${entity}Controller.update${Entity});
 
 // DELETE request - Delete a ${entity} by id
-router.delete('/${entity}s/:id', verifyToken, ${entity}Controller.delete${Entity});
+router.delete('/${entity}s/:id', ${guard}${entity}Controller.delete${Entity});
 
 module.exports = router;
 `;
+};
 
 module.exports = { model, controller, route };

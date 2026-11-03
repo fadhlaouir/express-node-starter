@@ -1,7 +1,9 @@
 /* -------------------------------------------------------------------------- */
 /*                                DEPENDENCIES                                */
 /* -------------------------------------------------------------------------- */
+const { existsSync } = require('node:fs');
 const fs = require('node:fs/promises');
+const path = require('node:path');
 const { capitalizeEntity, entityFiles } = require('./helpers');
 const templates = require('./templates');
 
@@ -19,6 +21,15 @@ const templates = require('./templates');
 async function generateMinimalCrud(entity, { minimal = true } = {}) {
   const Entity = capitalizeEntity(entity);
   const files = entityFiles(entity);
+  // Protect writes with a token when the project has authentication.
+  const protect = existsSync(
+    path.join(
+      path.dirname(files.route),
+      '..',
+      'middlewares',
+      'verify-token.js',
+    ),
+  );
 
   await Promise.all([
     fs.writeFile(files.model, templates.model(Entity, minimal), { flag: 'wx' }),
@@ -27,7 +38,9 @@ async function generateMinimalCrud(entity, { minimal = true } = {}) {
       templates.controller(Entity, entity, minimal),
       { flag: 'wx' },
     ),
-    fs.writeFile(files.route, templates.route(Entity, entity), { flag: 'wx' }),
+    fs.writeFile(files.route, templates.route(Entity, entity, protect), {
+      flag: 'wx',
+    }),
   ]);
 
   return Object.values(files);
