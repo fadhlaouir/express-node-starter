@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.1.1](https://github.com/fadhlaouir/express-node-starter/compare/v2.1.0...v2.1.1) (2026-11-03)
+
+### Bug Fixes
+
+* stop the docs redirect loop and rate limit every API route ([642a03f](https://github.com/fadhlaouir/express-node-starter/commit/642a03f4e599c3c07ddb47f3b99f84cf2989befa))
+
 ## [2.1.0](https://github.com/fadhlaouir/express-node-starter/compare/v2.0.0...v2.1.0) (2026-11-03)
 
 ### Features
