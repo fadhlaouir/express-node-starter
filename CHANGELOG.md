@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.1.0](https://github.com/fadhlaouir/express-node-starter/compare/v2.0.0...v2.1.0) (2026-11-03)
+
+### Features
+
+* **cli:** protect generated routes only in projects with authentication ([aa867a4](https://github.com/fadhlaouir/express-node-starter/commit/aa867a4f34d8f61bfad88a742dd473914007ddb8))
+
+### Bug Fixes
+
+* **cli:** create the models and controllers folders when they don't exist ([dda7679](https://github.com/fadhlaouir/express-node-starter/commit/dda767973a94daba8b8a65728170a3fa0c3318b2))
+
 ## [2.0.0](https://github.com/fadhlaouir/express-node-starter/compare/v1.11.0...v2.0.0) (2026-11-03)
 
 ### ⚠ BREAKING CHANGES
