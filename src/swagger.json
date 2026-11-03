@@ -1,227 +1,287 @@
 {
-  "swagger": "2.0",
+  "openapi": "3.0.3",
   "info": {
-    "version": "1.0.0",
-    "title": "Core API",
-    "description": "Backend for any application documented with Swagger",
-    "license": {
-      "name": "MIT",
-      "url": "https://spdx.org/licenses/MIT.html"
-    },
+    "title": "Express Node Starter API",
+    "version": "2.0.0",
+    "description": "REST API with JWT authentication, roles, account confirmation, password reset and uploads.",
+    "license": { "name": "MIT", "url": "https://spdx.org/licenses/MIT.html" },
     "contact": {
       "name": "Raed Fadhlaoui",
-      "url": "https://www.linkedin.com/in/fadhlaouiraed/",
-      "email": "raed.fadhlaoui@hotmail.com"
+      "url": "https://github.com/fadhlaouir/express-node-starter"
     }
   },
-  "host": "localhost:5000",
-  "basePath": "/v1/api",
+  "servers": [{ "url": "/v1/api" }],
   "tags": [
-    {
-      "name": "Auth",
-      "description": "API for authentification in the system"
-    },
-    {
-      "name": "Account",
-      "description": "API for user account in the system"
-    },
-    {
-      "name": "Users",
-      "description": "API for users in the system"
-    },
-    {
-      "name": "Event/News",
-      "description": "API for article in the system"
-    }
+    { "name": "Auth", "description": "Sign-up, sign-in and passwords" },
+    { "name": "Users", "description": "Accounts and profiles" }
   ],
-  "schemes": ["http"],
-  "consumes": ["application/json"],
-  "produces": ["application/json"],
-  "paths": {
-    "/auth/user-email": {
-      "post": {
-        "summary": "Check if we have the email exist in our Database or not",
-        "tags": ["Auth"],
-        "description": "Check if we have the email exist in our Database or not",
-        "parameters": [
-          {
-            "name": "user",
-            "in": "body",
-            "description": "email that we want to verify if we have in our database or not",
-            "schema": {
-              "$ref": "#/definitions/email"
-            }
-          }
-        ],
-        "produces": ["application/json"],
-        "responses": {
-          "200": {
-            "description": "success: true"
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "_id": { "type": "string" },
+          "email": { "type": "string", "format": "email" },
+          "fullName": { "type": "string" },
+          "photo": { "type": "string", "example": "uploads/3f1c….png" },
+          "role": {
+            "type": "string",
+            "enum": ["is_user", "is_manager", "is_admin"]
           },
-          "403": {
-            "description": "Email existe déjà"
+          "is_active": { "type": "boolean" },
+          "joined_at": { "type": "string", "format": "date-time" },
+          "updated_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "Message": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean" },
+          "message": { "type": "string" }
+        }
+      },
+      "Credentials": {
+        "type": "object",
+        "required": ["email", "password"],
+        "properties": {
+          "email": { "type": "string", "format": "email" },
+          "password": { "type": "string" }
+        }
+      },
+      "SignInResponse": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean" },
+          "token": { "type": "string" },
+          "user": { "$ref": "#/components/schemas/User" }
+        }
+      },
+      "Email": {
+        "type": "object",
+        "required": ["email"],
+        "properties": { "email": { "type": "string", "format": "email" } }
+      }
+    },
+    "responses": {
+      "Message": {
+        "description": "Result",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/Message" }
           }
         }
       }
-    },
-    "/auth/signup": {
+    }
+  },
+  "paths": {
+    "/auth/register": {
       "post": {
-        "summary": "Create new user",
         "tags": ["Auth"],
-        "description": "Create new user",
+        "summary": "Create an account",
+        "description": "The account is inactive until the email is confirmed. Role and activation are never taken from the request.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "password"],
+                "properties": {
+                  "email": { "type": "string", "format": "email" },
+                  "password": { "type": "string", "minLength": 8 },
+                  "fullName": { "type": "string" },
+                  "photo": { "type": "string", "format": "binary" }
+                }
+              }
+            },
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "password"],
+                "properties": {
+                  "email": { "type": "string", "format": "email" },
+                  "password": { "type": "string", "minLength": 8 },
+                  "fullName": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "$ref": "#/components/responses/Message" },
+          "409": { "$ref": "#/components/responses/Message" },
+          "422": { "$ref": "#/components/responses/Message" }
+        }
+      }
+    },
+    "/auth/confirm/{code}": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Activate an account with the code sent by email",
         "parameters": [
           {
-            "name": "user",
-            "in": "body",
-            "description": "User that we want to create",
-            "schema": {
-              "$ref": "#/definitions/newUser"
-            }
+            "name": "code",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
           }
         ],
-        "produces": ["application/json"],
         "responses": {
-          "200": {
-            "description": "New user is created",
-            "schema": {
-              "$ref": "#/definitions/User"
-            }
-          },
-          "UnauthorizedError": {
-            "description": "Authentication information is missing or invalid"
-          }
+          "200": { "$ref": "#/components/responses/Message" },
+          "400": { "$ref": "#/components/responses/Message" }
         }
+      }
+    },
+    "/auth/resend-confirmation": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Send a new confirmation email",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/Email" }
+            }
+          }
+        },
+        "responses": { "200": { "$ref": "#/components/responses/Message" } }
       }
     },
     "/auth/login": {
       "post": {
-        "summary": "Sigin with an existing user",
         "tags": ["Auth"],
-        "description": "Login with an existing user",
-        "parameters": [
-          {
-            "name": "user",
-            "in": "body",
-            "description": "User that we already have in our databse",
-            "schema": {
-              "$ref": "#/definitions/newUser"
+        "summary": "Sign in",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/Credentials" }
             }
           }
-        ],
-        "produces": ["application/json"],
+        },
         "responses": {
           "200": {
-            "description": "OK (successfully authenticated)"
+            "description": "Signed in",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/SignInResponse" }
+              }
+            }
           },
-          "UnauthorizedError": {
-            "description": "Authentication information is missing or invalid"
+          "401": { "$ref": "#/components/responses/Message" },
+          "403": { "$ref": "#/components/responses/Message" }
+        }
+      }
+    },
+    "/auth/admin/login": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Sign in to the back office (admins and managers)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/Credentials" }
+            }
           }
+        },
+        "responses": {
+          "200": {
+            "description": "Signed in",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/SignInResponse" }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Message" },
+          "403": { "$ref": "#/components/responses/Message" }
         }
       }
     },
     "/auth/forget-password": {
       "post": {
-        "summary": "Send email to reset password",
         "tags": ["Auth"],
-        "description": "Forget Password to send email",
-        "parameters": [
-          {
-            "name": "user",
-            "in": "body",
-            "description": "User that we need to reset password",
-            "schema": {
-              "$ref": "#/definitions/forgetUserPassword"
+        "summary": "Email a password reset link",
+        "description": "Answers the same whether or not the email has an account.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/Email" }
             }
           }
-        ],
-        "produces": ["application/json"],
-        "responses": {
-          "200": {
-            "description": "OK (Email Sent)"
-          },
-          "UnauthorizedError": {
-            "description": "User not found"
-          }
-        }
+        },
+        "responses": { "200": { "$ref": "#/components/responses/Message" } }
       }
     },
     "/auth/reset-password/{token}": {
-      "parameters": [
-        {
-          "name": "token",
-          "in": "path",
-          "required": true,
-          "description": "token of user password that we want to find",
-          "type": "string"
-        }
-      ],
       "post": {
-        "summary": "Create new password",
         "tags": ["Auth"],
-        "description": "Reset Password",
+        "summary": "Set a new password with a reset token",
         "parameters": [
           {
-            "name": "user",
-            "in": "body",
-            "description": "User that we need to reset password",
-            "schema": {
-              "$ref": "#/definitions/resetUserPassword"
-            }
+            "name": "token",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
           }
         ],
-        "produces": ["application/json"],
-        "responses": {
-          "200": {
-            "description": "OK (Password Updated)"
-          },
-          "UnauthorizedError": {
-            "description": "Password reset token is invalid or has expired"
-          }
-        }
-      }
-    },
-    "/account/{id}/disable": {
-      "parameters": [
-        {
-          "name": "userId",
-          "in": "path",
+        "requestBody": {
           "required": true,
-          "description": "ID of user that we want to find",
-          "type": "string"
-        }
-      ],
-      "put": {
-        "summary": "Disable user account with given ID",
-        "tags": ["Account"],
-        "responses": {
-          "200": {
-            "description": "Account Disabled"
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["newPassword", "verifyPassword"],
+                "properties": {
+                  "newPassword": { "type": "string", "minLength": 8 },
+                  "verifyPassword": { "type": "string" }
+                }
+              }
+            }
           }
+        },
+        "responses": {
+          "200": { "$ref": "#/components/responses/Message" },
+          "400": { "$ref": "#/components/responses/Message" },
+          "422": { "$ref": "#/components/responses/Message" }
         }
       }
     },
-    "/account/{token}/enable": {
+    "/users/check-email": {
       "post": {
-        "summary": "Enable user account with given email and password",
-        "description": "Enable user account",
-        "tags": ["Account"],
-        "parameters": [
-          {
-            "name": "user",
-            "in": "body",
-            "description": "User that we already have in our databse",
-            "schema": {
-              "$ref": "#/definitions/newUser"
+        "tags": ["Users"],
+        "summary": "Check whether an email is registered",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/Email" }
             }
           }
-        ],
-        "produces": ["application/json"],
+        },
         "responses": {
           "200": {
-            "description": "OK (successfully Activate account)"
-          },
-          "UnauthorizedError": {
-            "description": "Authentication information is missing or invalid"
+            "description": "Result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "exists": { "type": "boolean" }
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -229,409 +289,171 @@
     "/users": {
       "get": {
         "tags": ["Users"],
-        "summary": "Get all users",
+        "summary": "List users (admins and managers)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": { "type": "integer", "default": 1 }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": { "type": "integer", "default": 20, "maximum": 100 }
+          }
+        ],
         "responses": {
           "200": {
-            "description": "Return Array of users",
-            "schema": {
-              "$ref": "#/definitions/Users"
+            "description": "A page of users",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "users": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/User" }
+                    },
+                    "pagination": {
+                      "type": "object",
+                      "properties": {
+                        "page": { "type": "integer" },
+                        "limit": { "type": "integer" },
+                        "total": { "type": "integer" },
+                        "pages": { "type": "integer" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Message" },
+          "403": { "$ref": "#/components/responses/Message" }
+        }
+      }
+    },
+    "/users/me": {
+      "get": {
+        "tags": ["Users"],
+        "summary": "Get the signed-in user",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "The user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "user": { "$ref": "#/components/schemas/User" }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Message" }
+        }
+      }
+    },
+    "/users/me/password": {
+      "put": {
+        "tags": ["Users"],
+        "summary": "Change the signed-in user's password",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["currentPassword", "newPassword"],
+                "properties": {
+                  "currentPassword": { "type": "string" },
+                  "newPassword": { "type": "string", "minLength": 8 }
+                }
+              }
             }
           }
+        },
+        "responses": {
+          "200": { "$ref": "#/components/responses/Message" },
+          "401": { "$ref": "#/components/responses/Message" },
+          "422": { "$ref": "#/components/responses/Message" }
         }
       }
     },
     "/users/{id}": {
       "parameters": [
         {
-          "name": "userId",
+          "name": "id",
           "in": "path",
           "required": true,
-          "description": "ID of user that we want to find",
-          "type": "string"
+          "schema": { "type": "string" }
         }
       ],
       "get": {
         "tags": ["Users"],
-        "summary": "Get user with given ID",
+        "summary": "Get a user (the user themselves, admins and managers)",
+        "security": [{ "bearerAuth": [] }],
         "responses": {
           "200": {
-            "description": "User is found",
-            "schema": {
-              "$ref": "#/definitions/User"
-            }
-          }
-        }
-      },
-      "put": {
-        "summary": "Update user with give ID",
-        "tags": ["Users"],
-        "parameters": [
-          {
-            "name": "user",
-            "in": "body",
-            "description": "User with new values of properties",
-            "schema": {
-              "$ref": "#/definitions/User"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "User is updated",
-            "schema": {
-              "$ref": "#/definitions/User"
-            }
-          }
-        }
-      },
-      "delete": {
-        "summary": "Delete user with given ID",
-        "tags": ["Users"],
-        "responses": {
-          "200": {
-            "description": "User is deleted"
-          }
-        }
-      }
-    },
-    "/event": {
-      "post": {
-        "summary": "Create new event",
-        "tags": ["Event/News"],
-        "description": "Create new Event",
-        "parameters": [
-          {
-            "name": "user",
-            "in": "body",
-            "description": "Event that we want to create",
-            "schema": {
-              "$ref": "#/definitions/newEvent"
-            }
-          }
-        ],
-        "produces": ["application/json"],
-        "responses": {
-          "200": {
-            "description": "New Event is created",
-            "schema": {
-              "$ref": "#/definitions/Event"
-            }
-          }
-        }
-      }
-    },
-    "/events": {
-      "get": {
-        "tags": ["Event/News"],
-        "summary": "Get all Events",
-        "responses": {
-          "200": {
-            "description": "Return Array of Events",
-            "schema": {
-              "$ref": "#/definitions/Event"
-            }
-          }
-        }
-      }
-    },
-    "/events/{Id}": {
-      "parameters": [
-        {
-          "name": "Id",
-          "in": "path",
-          "required": true,
-          "description": "ID of article that we want to find",
-          "type": "string"
-        }
-      ],
-      "get": {
-        "tags": ["Event/News"],
-        "summary": "Get Event with given ID",
-        "responses": {
-          "200": {
-            "description": "Event is found",
-            "schema": {
-              "$ref": "#/definitions/Event"
+            "description": "The user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "user": { "$ref": "#/components/schemas/User" }
+                  }
+                }
+              }
             }
           },
-          "403": {
-            "description": "Event not found"
-          }
+          "403": { "$ref": "#/components/responses/Message" },
+          "404": { "$ref": "#/components/responses/Message" }
         }
       },
       "put": {
-        "summary": "Update Event with give ID",
-        "tags": ["Event/News"],
-        "parameters": [
-          {
-            "name": "Event",
-            "in": "body",
-            "description": "Event with new values of properties",
-            "schema": {
-              "$ref": "#/definitions/Event"
+        "tags": ["Users"],
+        "summary": "Update a user (the user themselves, admins and managers)",
+        "description": "Users can change fullName and photo. Only admins can change role and is_active.",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "fullName": { "type": "string" },
+                  "photo": { "type": "string", "format": "binary" },
+                  "role": {
+                    "type": "string",
+                    "enum": ["is_user", "is_manager", "is_admin"]
+                  }
+                }
+              }
             }
           }
-        ],
+        },
         "responses": {
-          "200": {
-            "description": "Event is updated",
-            "schema": {
-              "$ref": "#/definitions/Event"
-            }
-          }
+          "200": { "$ref": "#/components/responses/Message" },
+          "403": { "$ref": "#/components/responses/Message" },
+          "404": { "$ref": "#/components/responses/Message" }
         }
       },
       "delete": {
-        "summary": "Delete Event with given ID",
-        "tags": ["Event/News"],
+        "tags": ["Users"],
+        "summary": "Delete a user (the user themselves, or an admin)",
+        "security": [{ "bearerAuth": [] }],
         "responses": {
-          "200": {
-            "description": "Event is deleted"
-          }
-        }
-      }
-    }
-  },
-  "definitions": {
-    "email": {
-      "required": ["email"],
-      "properties": {
-        "email": {
-          "type": "string",
-          "uniqueItems": true
-        }
-      }
-    },
-    "newUser": {
-      "required": ["email", "password"],
-      "properties": {
-        "email": {
-          "type": "string",
-          "uniqueItems": true
-        },
-        "password": {
-          "type": "string",
-          "format": "password"
-        }
-      }
-    },
-    "forgetUserPassword": {
-      "required": ["email"],
-      "properties": {
-        "email": {
-          "type": "string",
-          "uniqueItems": true
-        }
-      }
-    },
-    "resetUserPassword": {
-      "required": ["resetPasswordToken", "resetPasswordExpires"],
-      "properties": {
-        "resetPasswordToken": {
-          "type": "string",
-          "format": "password"
-        },
-        "resetPasswordExpires": {
-          "type": "string",
-          "format": "password"
-        }
-      }
-    },
-    "User": {
-      "required": ["email", "password"],
-      "properties": {
-        "email": {
-          "type": "string",
-          "uniqueItems": true
-        },
-        "password": {
-          "type": "string",
-          "format": "password"
-        },
-        "fullName": {
-          "type": "string"
-        },
-        "photo": {
-          "type": "string"
-        },
-        "canHelpWith": {
-          "type": "string"
-        },
-        "governorate": {
-          "type": "string"
-        },
-        "municipality": {
-          "type": "string"
-        },
-        "age": {
-          "type": "Number"
-        },
-        "gender": {
-          "type": "string"
-        },
-        "dateOfBirth": {
-          "type": "string"
-        },
-        "phoneNumber": {
-          "type": "string"
-        },
-        "whatsappNumber": {
-          "type": "string"
-        },
-        "bloodType": {
-          "type": "string"
-        },
-        "bloodHelpCount": {
-          "type": "Number"
-        },
-        "materialHelpCount": {
-          "type": "Number"
-        },
-        "is_volunteer": {
-          "type": "boolean"
-        },
-        "is_doner": {
-          "type": "boolean"
-        },
-        "is_active": {
-          "type": "boolean"
-        },
-        "is_anonymous": {
-          "type": "boolean"
-        },
-        "is_admin": {
-          "type": "boolean"
-        },
-        "is_manager": {
-          "type": "boolean"
-        },
-        "last_donation": {
-          "type": "number",
-          "format": "string"
-        }
-      }
-    },
-    "Users": {
-      "type": "array",
-      "$ref": "#/definitions/User"
-    },
-    "newEvent": {
-      "properties": {
-        "gallery": {
-          "type": "array",
-          "items": {}
-        },
-        "photo": {
-          "type": "string"
-        },
-        "start_at": {
-          "type": "string"
-        },
-        "end_at": {
-          "type": "string"
-        },
-        "link": {
-          "type": "string"
-        },
-        "isEvent": {
-          "type": "boolean"
-        },
-        "event_name_ar": {
-          "type": "string"
-        },
-        "description_ar": {
-          "type": "string"
-        },
-        "event_location_ar": {
-          "type": "string"
-        },
-        "event_name_fr": {
-          "type": "string"
-        },
-        "description_fr": {
-          "type": "string"
-        },
-        "event_location_fr": {
-          "type": "string"
-        },
-        "coordinates": {
-          "type": "object",
-          "properties": {
-            "latitude": {
-              "type": "string"
-            },
-            "longitude": {
-              "type": "string"
-            }
-          }
-        }
-      }
-    },
-    "Event": {
-      "properties": {
-        "gallery": {
-          "type": "array",
-          "items": {}
-        },
-        "photo": {
-          "type": "string"
-        },
-        "start_at": {
-          "type": "string"
-        },
-        "end_at": {
-          "type": "string"
-        },
-        "link": {
-          "type": "string"
-        },
-        "isEvent": {
-          "type": "boolean"
-        },
-        "ar": {
-          "type": "object",
-          "properties": {
-            "event_name": {
-              "type": "string"
-            },
-            "description": {
-              "type": "string"
-            },
-            "event_location": {
-              "type": "string"
-            }
-          }
-        },
-        "fr": {
-          "type": "object",
-          "properties": {
-            "event_name": {
-              "type": "string"
-            },
-            "description": {
-              "type": "string"
-            },
-            "event_location": {
-              "type": "string"
-            }
-          }
-        },
-        "coordinates": {
-          "type": "object",
-          "properties": {
-            "latitude": {
-              "type": "string"
-            },
-            "longitude": {
-              "type": "string"
-            }
-          }
-        },
-        "createdAt": {
-          "type": "string"
-        },
-        "updatedAt": {
-          "type": "string"
+          "200": { "$ref": "#/components/responses/Message" },
+          "403": { "$ref": "#/components/responses/Message" },
+          "404": { "$ref": "#/components/responses/Message" }
         }
       }
     }

@@ -1,35 +1,33 @@
 /* -------------------------------------------------------------------------- */
 /*                                Dependencies                                */
 /* -------------------------------------------------------------------------- */
-
-// Packages
 const jwt = require('jsonwebtoken');
+const { env } = require('../config/env');
 
-module.exports = function (req, res, next) {
-  let token = req.headers['x-access-token'] || req.headers['authorization'];
+/* -------------------------------------------------------------------------- */
+/*                                Verify token                                */
+/* -------------------------------------------------------------------------- */
 
-  if (token) {
-    // it's optional => to delete Bearer from token
-    let checkBearer = 'Bearer ';
-    if (token.startsWith(checkBearer)) {
-      token = token.slice(checkBearer.length, token.length);
-    }
+/**
+ * Require a valid JWT, sent as `Authorization: Bearer <token>` (or the legacy
+ * `x-access-token` header). Sets `req.decoded` to `{ _id, role }`.
+ */
+module.exports = function verifyToken(req, res, next) {
+  let token = req.headers.authorization || req.headers['x-access-token'];
 
-    jwt.verify(token, process.env.SECRET, (err, decoded) => {
-      if (err) {
-        res.status(403).json({
-          success: false,
-          message: 'Failed to authenticate',
-        });
-      } else {
-        req.decoded = decoded; // decoded is simply user {}
-        next();
-      }
-    });
-  } else {
-    res.status(403).json({
-      success: false,
-      message: 'No token Provided',
-    });
+  if (!token) {
+    return res
+      .status(401)
+      .json({ success: false, message: 'No token provided' });
+  }
+  if (token.startsWith('Bearer ')) token = token.slice('Bearer '.length);
+
+  try {
+    req.decoded = jwt.verify(token, env.jwtSecret, { algorithms: ['HS256'] });
+    return next();
+  } catch {
+    return res
+      .status(401)
+      .json({ success: false, message: 'Invalid or expired token' });
   }
 };

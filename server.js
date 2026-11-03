@@ -1,72 +1,41 @@
 /* -------------------------------------------------------------------------- */
 /*                                Dependencies                                */
 /* -------------------------------------------------------------------------- */
-// Packages
-const express = require('express');
-const dotenv = require('dotenv');
-const morgan = require('morgan');
-const bodyParser = require('body-parser');
-var cors = require('cors');
-const path = require('path');
-const mongoose = require('mongoose');
+const { env, assertRequiredEnv } = require('./src/config/env');
+const {
+  connectDatabase,
+  disconnectDatabase,
+} = require('./src/config/database');
 
-// Swagger
-const swaggerUi = require('swagger-ui-express');
-const swaggerDocument = require('./src/swagger.json');
+/* -------------------------------------------------------------------------- */
+/*                                   Server                                   */
+/* -------------------------------------------------------------------------- */
 
-// config
-dotenv.config();
+/**
+ * Check the configuration, connect to MongoDB, then start listening.
+ */
+async function start() {
+  assertRequiredEnv();
+  const app = require('./src/app');
+  await connectDatabase(env.databaseUrl);
 
-// const
-const app = express();
+  const server = app.listen(env.port, () => {
+    console.log(`Listening on PORT ${env.port}`);
+  });
 
-// DATABASE CONNECTION
-mongoose.set('strictQuery', false);
-mongoose.connect(
-  process.env.NODE_ENV === 'production'
-    ? process.env.PROD_DATABASE
-    : process.env.DEV_DATABASE,
-  (err) => {
-    if (err) {
-      console.log(err);
-    } else {
-      console.log('Connected to the database');
-    }
-  },
-);
+  // Finish in-flight requests and close the database before exiting.
+  const shutdown = (signal) => {
+    console.log(`${signal} received, shutting down`);
+    server.close(async () => {
+      await disconnectDatabase();
+      process.exit(0);
+    });
+  };
+  process.on('SIGINT', shutdown);
+  process.on('SIGTERM', shutdown);
+}
 
-// Middleware
-app.use(morgan('dev'));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(express.static(path.join(__dirname, 'uploads')));
-app.use(cors());
-
-// Require APIs
-const userRoutes = require('./src/routes/user.route');
-const authRoutes = require('./src/routes/auth.route');
-
-// local APIs
-app.use('/v1/api', authRoutes);
-app.use('/v1/api', userRoutes);
-
-// API for uploads file (photo, galleries)
-app.get('/uploads/:id', (req, res) => {
-  res.sendFile(path.join(__dirname, `./uploads/${req.params.id}`));
+start().catch((error) => {
+  console.error(error.message);
+  process.exit(1);
 });
-
-// API for swagger documentation
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-
-// PORT
-const PORT = process.env.PORT || 5000;
-
-app.listen(PORT, (err) => {
-  if (err) {
-    console.log(err);
-  } else {
-    console.log(`Listening on PORT ${PORT}`);
-  }
-});
-
-module.exports = app;

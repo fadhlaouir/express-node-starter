@@ -1,139 +1,146 @@
 /* -------------------------------------------------------------------------- */
 /*                                Dependencies                                */
 /* -------------------------------------------------------------------------- */
-const fs = require('fs');
 const User = require('../models/user.model');
+const { ROLES } = require('../models/user.model');
+const { toPublicPath, removeUpload } = require('../middlewares/multer');
+const { HttpError, readString, readPassword } = require('../utils/request');
 
 /* -------------------------------------------------------------------------- */
 /*                               User Controller                              */
 /* -------------------------------------------------------------------------- */
 
 /**
- * Check if the email exists in the database
- * @param {Object} req - The request object
- * @param {Object} res - The response object
+ * Check whether an email is already registered (for sign-up forms).
  */
 const checkExistEmail = async (req, res) => {
-  try {
-    const foundUser = await User.findOne({ email: req.body.email });
-    const message = foundUser ? 'Email existe déjà' : '';
-    res.status(foundUser ? 403 : 200).json({ success: !foundUser, message });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
+  const email = readString(req.body?.email, 'email', { required: true });
+  const exists = Boolean(await User.exists({ email: email.toLowerCase() }));
+  res.json({ success: true, exists });
 };
 
 /**
- * Retrieves the current user object
- * @param {Object} req - The request object
- * @param {Object} res - The response object
+ * Get the signed-in user.
  */
 const getCurrentUser = async (req, res) => {
-  try {
-    const foundUser = await User.findById(req.decoded._id);
-    res
-      .status(foundUser ? 200 : 404)
-      .json({ success: !!foundUser, user: foundUser });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
+  const user = await User.findById(req.decoded._id);
+  if (!user) throw new HttpError(404, 'User not found');
+  res.json({ success: true, user });
 };
 
 /**
- * Retrieves a user by ID
- * @param {Object} req - The request object
- * @param {Object} res - The response object
+ * Get a user by id: the user themselves, or staff.
  */
 const getUserById = async (req, res) => {
-  try {
-    const foundUser = await User.findById(req.params.id);
-    res
-      .status(foundUser ? 200 : 404)
-      .json({ success: !!foundUser, user: foundUser });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
+  const user = await User.findById(req.params.id);
+  if (!user) throw new HttpError(404, 'User not found');
+  res.json({ success: true, user });
 };
 
 /**
- * Update a user by ID
- * @param {Object} req - The request object
- * @param {Object} res - The response object
- */
-const updateUserById = async (req, res) => {
-  try {
-    const { id } = req.params;
-    let foundUser = await User.findById(id);
-
-    const updateImages = {};
-    if (req.files?.photo) {
-      if (foundUser.photo !== '') fs.unlinkSync(foundUser.photo);
-      updateImages.photo = req.files.photo[0].path.replace('\\', '/');
-    }
-
-    const updatedUser = await User.findByIdAndUpdate(
-      id,
-      {
-        ...updateImages,
-        ...req.body,
-        updated_at: Date.now(),
-      },
-      { new: true },
-    );
-
-    res.status(updatedUser ? 200 : 404).json({
-      success: !!updatedUser,
-      message: updatedUser
-        ? "Mise à jour réussie de l'utilisateur"
-        : 'Utilisateur non trouvé',
-      updatedUser,
-    });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-};
-
-/**
- * Retrieves all users
- * @param {Object} req - The request object
- * @param {Object} res - The response object
+ * List users, newest first, with pagination: ?page=1&limit=20 (staff only).
  */
 const getAllUsers = async (req, res) => {
+  const page = Math.max(1, Number.parseInt(req.query.page, 10) || 1);
+  const limit = Math.min(
+    100,
+    Math.max(1, Number.parseInt(req.query.limit, 10) || 20),
+  );
+
+  const [users, total] = await Promise.all([
+    User.find()
+      .sort({ joined_at: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit),
+    User.countDocuments(),
+  ]);
+
+  res.json({
+    success: true,
+    users,
+    pagination: { page, limit, total, pages: Math.ceil(total / limit) },
+  });
+};
+
+/**
+ * Update a user: the user themselves, or staff. Users can change their name and
+ * photo; only admins can change a role or activation. Passwords change through
+ * PUT /users/me/password.
+ */
+const updateUserById = async (req, res) => {
+  const photo = req.files?.photo?.[0];
   try {
-    const users = await User.find();
-    res.status(200).json({ success: true, users });
+    const user = await User.findById(req.params.id);
+    if (!user) throw new HttpError(404, 'User not found');
+
+    const fullName = readString(req.body?.fullName, 'fullName');
+    if (fullName !== undefined) user.fullName = fullName;
+
+    if (req.decoded.role === 'is_admin') {
+      const role = readString(req.body?.role, 'role');
+      if (role !== undefined) {
+        if (!ROLES.includes(role)) throw new HttpError(422, 'Unknown role');
+        user.role = role;
+      }
+      if (typeof req.body?.is_active === 'boolean') {
+        user.is_active = req.body.is_active;
+      }
+    }
+
+    const previousPhoto = user.photo;
+    if (photo) user.photo = toPublicPath(photo);
+
+    await user.save();
+    if (photo) await removeUpload(previousPhoto);
+
+    res.json({ success: true, message: 'User updated', user });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    if (photo) await removeUpload(toPublicPath(photo));
+    throw error;
   }
 };
 
 /**
- * Deletes a user by ID
- * @param {Object} req - The request object
- * @param {Object} res - The response object
+ * Change the signed-in user's password. Requires the current password.
+ */
+const changePassword = async (req, res) => {
+  const currentPassword = readString(
+    req.body?.currentPassword,
+    'currentPassword',
+    { required: true },
+  );
+  const newPassword = readPassword(req.body?.newPassword, 'newPassword');
+
+  const user = await User.findById(req.decoded._id).select('+password');
+  if (!user) throw new HttpError(404, 'User not found');
+  if (!(await user.comparePassword(currentPassword))) {
+    throw new HttpError(401, 'Current password is incorrect');
+  }
+
+  user.password = newPassword;
+  await user.save();
+  res.json({ success: true, message: 'Password changed' });
+};
+
+/**
+ * Delete a user: the user themselves, or an admin.
  */
 const deleteUser = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const user = await User.findById(id);
-    if (user.photo !== '') fs.unlinkSync(user.photo);
-    const deletedUser = await User.findByIdAndDelete(id);
-    res.status(deletedUser ? 200 : 404).json({
-      success: !!deletedUser,
-      message: deletedUser
-        ? "L'utilisateur a été supprimée avec succès"
-        : 'Utilisateur non trouvé',
-    });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+  if (req.decoded._id !== req.params.id && req.decoded.role !== 'is_admin') {
+    throw new HttpError(403, 'You are not allowed to do this');
   }
+  const user = await User.findByIdAndDelete(req.params.id);
+  if (!user) throw new HttpError(404, 'User not found');
+  await removeUpload(user.photo);
+  res.json({ success: true, message: 'User deleted' });
 };
 
 module.exports = {
   checkExistEmail,
   getCurrentUser,
   getUserById,
-  updateUserById,
   getAllUsers,
+  updateUserById,
+  changePassword,
   deleteUser,
 };

@@ -1,41 +1,56 @@
 /* -------------------------------------------------------------------------- */
 /*                                Dependencies                                */
 /* -------------------------------------------------------------------------- */
-// Packages
 const router = require('express').Router();
 
 // Middlewares
 const verifyToken = require('../middlewares/verify-token');
+const { allowRoles, allowSelfOrStaff } = require('../middlewares/authorize');
 const { fileUpload } = require('../middlewares/multer');
+const { authLimiter } = require('../middlewares/rate-limit');
 
-// controllers
+// Controllers
 const userController = require('../controllers/user.controller');
 
 /* -------------------------------------------------------------------------- */
 /*                                 User Route                                 */
 /* -------------------------------------------------------------------------- */
 
-// Get reqyest - check if email exist or not
-router.post('/users/check-email', userController.checkExistEmail);
+// POST request - Check whether an email is already registered
+router.post('/users/check-email', authLimiter, userController.checkExistEmail);
 
-// GET request - Get all users
-router.get('/users', verifyToken, userController.getAllUsers);
+// GET request - List users (admins and managers)
+router.get(
+  '/users',
+  verifyToken,
+  allowRoles('is_admin', 'is_manager'),
+  userController.getAllUsers,
+);
 
-// GET request - Get current user
+// GET request - Get the signed-in user
 router.get('/users/me', verifyToken, userController.getCurrentUser);
 
-// GET request - Get usser by Id
-router.get('/users/:id', userController.getUserById);
+// PUT request - Change the signed-in user's password
+router.put('/users/me/password', verifyToken, userController.changePassword);
 
-// PUT request - Update user by id
+// GET request - Get a user (the user themselves, admins and managers)
+router.get(
+  '/users/:id',
+  verifyToken,
+  allowSelfOrStaff,
+  userController.getUserById,
+);
+
+// PUT request - Update a user (the user themselves, admins and managers)
 router.put(
   '/users/:id',
   verifyToken,
+  allowSelfOrStaff,
   fileUpload,
   userController.updateUserById,
 );
 
-// DELETE request - delete user
+// DELETE request - Delete a user (the user themselves, or an admin)
 router.delete('/users/:id', verifyToken, userController.deleteUser);
 
 module.exports = router;

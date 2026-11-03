@@ -1,6 +1,12 @@
 /node_modules
-npm-debug.log
-package-lock.json
+npm-debug.log*
 .DS_Store
+/coverage
+
+# Uploaded files
 /uploads
-/.env
+
+# Environment: never commit secrets
+.env
+.env.*
+!.env.example

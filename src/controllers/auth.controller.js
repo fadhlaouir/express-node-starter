@@ -1,327 +1,276 @@
 /* -------------------------------------------------------------------------- */
 /*                                Dependencies                                */
 /* -------------------------------------------------------------------------- */
-// Packages
-const crypto = require('crypto');
+const crypto = require('node:crypto');
+const jwt = require('jsonwebtoken');
 
 // Models
 const User = require('../models/user.model');
+const { hashToken } = require('../models/user.model');
 
-// Token
-const jwt = require('jsonwebtoken');
-
-// Email Template
+// Helpers
+const { env } = require('../config/env');
+const { API_ENDPOINT, sendEmail } = require('../utils/helpers');
+const { HttpError, readString, readPassword } = require('../utils/request');
+const { STAFF_ROLES } = require('../middlewares/authorize');
+const { toPublicPath, removeUpload } = require('../middlewares/multer');
 const {
   singUpConfirmationEmailTemplate,
   forgotPasswordEmailTemplate,
   resetPasswordConfirmationEmailTemplate,
 } = require('../template/userAccountEmailTemplates');
 
-// Helpers
-const { sendEmail, FROM_EMAIL, API_ENDPOINT } = require('../utils/helpers');
+/* -------------------------------------------------------------------------- */
+/*                                   Helpers                                  */
+/* -------------------------------------------------------------------------- */
+const RESET_TOKEN_TTL = 60 * 60 * 1000; // 1 hour
+const GENERIC_EMAIL_MESSAGE =
+  'If an account exists for this email, you will receive instructions shortly';
+
+/**
+ * Sign a token with only what the API needs: never the whole user document.
+ * @param {import('mongoose').Document} user
+ * @returns {string}
+ */
+const signToken = (user) =>
+  jwt.sign({ _id: user._id.toString(), role: user.role }, env.jwtSecret, {
+    expiresIn: env.jwtExpiresIn,
+    algorithm: 'HS256',
+  });
+
+/**
+ * Public fields returned after sign-in.
+ * @param {import('mongoose').Document} user
+ */
+const publicUser = (user) => ({
+  _id: user._id,
+  email: user.email,
+  fullName: user.fullName,
+  photo: user.photo,
+  role: user.role,
+});
+
+/**
+ * Create a one-time code: the plain value goes in the email, the hash in the database.
+ * @returns {{ code: string, hash: string }}
+ */
+const createCode = () => {
+  const code = crypto.randomBytes(32).toString('hex');
+  return { code, hash: hashToken(code) };
+};
+
+/**
+ * Send the account confirmation email.
+ * @param {import('mongoose').Document} user
+ * @param {string} code
+ */
+const sendConfirmationEmail = (user, code) =>
+  sendEmail({
+    to: user.email,
+    subject: 'Confirm your account',
+    html: singUpConfirmationEmailTemplate(
+      user.fullName,
+      API_ENDPOINT,
+      user.email,
+      code,
+    ),
+  });
+
+/**
+ * Check credentials and account state. Same message for an unknown email or a
+ * wrong password, so the response doesn't reveal which accounts exist.
+ * @param {import('express').Request} req
+ */
+const authenticate = async (req) => {
+  const email = readString(req.body?.email, 'email', { required: true });
+  const password = readString(req.body?.password, 'password', {
+    required: true,
+  });
+
+  const user = await User.findOne({ email: email.toLowerCase() }).select(
+    '+password',
+  );
+  if (!user || !(await user.comparePassword(password))) {
+    throw new HttpError(401, 'Incorrect email or password');
+  }
+  if (!user.is_active) {
+    throw new HttpError(
+      403,
+      'Your account is not activated yet. Check your email for the confirmation link',
+    );
+  }
+  return user;
+};
 
 /* -------------------------------------------------------------------------- */
-/*                                   HELPERS                                  */
+/*                               Auth Controller                              */
 /* -------------------------------------------------------------------------- */
 
 /**
- * Sign up a new user
- * @param {Object} req - Request object containing user data
- * @param {Object} res - Response object to send JSON response
+ * Create an account. New accounts are inactive users until the email is confirmed.
+ * Role and activation are never taken from the request.
  */
 const signUp = async (req, res) => {
+  const photo = req.files?.photo?.[0];
   try {
-    const { email, password, fullName, role, is_active } = req.body;
+    const email = readString(req.body?.email, 'email', { required: true });
+    const password = readPassword(req.body?.password);
+    const fullName = readString(req.body?.fullName, 'fullName');
 
-    // Check if email and password are provided
-    if (!email || !password) {
-      return res.status(403).json({
-        success: false,
-        message: 'Veuillez saisir votre email ou votre mot de passe',
-      });
+    if (await User.exists({ email: email.toLowerCase() })) {
+      throw new HttpError(409, 'A user with this email already exists');
     }
 
-    // Check if user with the provided email already exists
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(409).json({
-        success: false,
-        message: 'Un utilisateur avec cet e-mail existe déjà',
-      });
-    }
-
-    // Create a new user instance
-    const newUser = new User({
+    const { code, hash } = createCode();
+    const user = await User.create({
       email,
       password,
-      confirmationCode: crypto.randomBytes(20).toString('hex'),
       fullName,
-      photo: req.files?.photo ? req.files.photo[0].path.replace('\\', '/') : '',
-      is_active: is_active ?? false,
-      role,
-      joined_at: new Date(),
+      photo: photo ? toPublicPath(photo) : '',
+      confirmationCode: hash,
     });
 
-    // Save the new user
-    await newUser.save();
+    await sendConfirmationEmail(user, code);
 
-    // Send confirmation email
-    const template = singUpConfirmationEmailTemplate(
-      newUser.fullName,
-      API_ENDPOINT,
-      newUser.email,
-      newUser.confirmationCode,
-    );
-
-    const data = {
-      from: FROM_EMAIL,
-      to: newUser.email,
-      subject: 'Confirmation de votre enregistrement sur l’application',
-      html: template,
-    };
-
-    await sendEmail(data);
-
-    return res.json({
-      message: "Veuillez vérifier votre e-mail pour plus d'instructions",
+    return res.status(201).json({
+      success: true,
+      message: 'Account created. Check your email to activate it',
     });
   } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message:
-        "Une erreur est survenue lors de l'enregistrement de l'utilisateur",
-      error: error.message,
-    });
+    if (photo) await removeUpload(toPublicPath(photo));
+    throw error;
   }
 };
 
 /**
- * Sign in with an existing account
- * @param {Object} req - Request object containing user credentials
- * @param {Object} res - Response object to send JSON response
+ * Activate an account with the code sent by email.
+ */
+const confirmAccount = async (req, res) => {
+  const code = readString(req.params.code, 'code', { required: true });
+  const user = await User.findOneAndUpdate(
+    { confirmationCode: hashToken(code) },
+    { is_active: true, $unset: { confirmationCode: 1 } },
+    { returnDocument: 'after' },
+  );
+  if (!user) {
+    throw new HttpError(
+      400,
+      'This confirmation link is invalid or was already used',
+    );
+  }
+  return res.json({ success: true, message: 'Your account is activated' });
+};
+
+/**
+ * Send a new confirmation email to an account that isn't active yet.
+ */
+const resendConfirmation = async (req, res) => {
+  const email = readString(req.body?.email, 'email', { required: true });
+  const user = await User.findOne({
+    email: email.toLowerCase(),
+    is_active: false,
+  });
+  if (user) {
+    const { code, hash } = createCode();
+    user.confirmationCode = hash;
+    await user.save();
+    await sendConfirmationEmail(user, code);
+  }
+  return res.json({ success: true, message: GENERIC_EMAIL_MESSAGE });
+};
+
+/**
+ * Sign in with an email and password.
  */
 const signIn = async (req, res) => {
-  try {
-    const { email, password } = req.body;
-
-    // Find the user by email
-    const foundUser = await User.findOne({ email });
-
-    // If user not found or password doesn't match, return error
-    if (!foundUser || !foundUser.comparePassword(password)) {
-      return res.status(403).json({
-        success: false,
-        message: "Échec de l'authentification, email ou mot de passe incorrect",
-      });
-    }
-
-    // Check if user account is active
-    if (!foundUser.is_active) {
-      return res.status(405).json({
-        success: false,
-        message:
-          "Votre compte n'est pas activé ! Merci de consulter votre email ou contacter l'équipe",
-      });
-    }
-
-    // Generate JWT token
-    const token = jwt.sign(foundUser.toJSON(), process.env.SECRET, {
-      expiresIn: '7d', // Token expires in 7 days
-    });
-
-    // Return success response with token and user information
-    return res.json({
-      success: true,
-      token,
-      user: {
-        _id: foundUser._id,
-        email: foundUser.email,
-        fullName: foundUser.fullName,
-        role: foundUser.role,
-      },
-    });
-  } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: "Une erreur est survenue lors de l'authentification",
-      error: error.message,
-    });
-  }
+  const user = await authenticate(req);
+  return res.json({
+    success: true,
+    token: signToken(user),
+    user: publicUser(user),
+  });
 };
 
 /**
- * Sign in with an existing account as in admin
- * @param {Object} req - Request object containing user credentials
- * @param {Object} res - Response object to send JSON response
+ * Sign in to the back office: admins and managers only.
  */
 const adminSignIn = async (req, res) => {
-  try {
-    const { email, password } = req.body;
-
-    // Find the user by email
-    const foundUser = await User.findOne({ email });
-
-    // If user not found or password doesn't match, return error
-    if (!foundUser || !(await foundUser.comparePassword(password))) {
-      return res.status(403).json({
-        success: false,
-        message:
-          "Échec de l'authentification, utilisateur introuvable ou mot de passe erroné",
-      });
-    }
-
-    // Check if user account is active
-    if (!foundUser.is_active) {
-      return res.status(405).json({
-        success: false,
-        message:
-          "Votre compte n'est pas activé ! Merci de consulter votre email ou contacter l'équipe",
-      });
-    }
-
-    // Check user role
-    const allowedRoles = ['is_admin', 'is_manager'];
-    if (!allowedRoles.includes(foundUser.role)) {
-      return res.status(403).json({
-        success: false,
-        message: "Vous n'êtes pas autorisé à vous connecter",
-      });
-    }
-
-    // Generate JWT token
-    const token = jwt.sign(
-      { ...foundUser.toJSON(), isAdmin: true },
-      process.env.SECRET,
-      {
-        expiresIn: 604800,
-      },
-    );
-
-    return res.json({
-      success: true,
-      token,
-      // return user information without password field
-      user: {
-        _id: foundUser._id,
-        email: foundUser.email,
-        fullName: foundUser.fullName,
-        role: foundUser.role,
-      },
-    });
-  } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: "Une erreur est survenue lors de l'authentification",
-      error: error.message,
-    });
+  const user = await authenticate(req);
+  if (!STAFF_ROLES.includes(user.role)) {
+    throw new HttpError(403, 'You are not allowed to sign in here');
   }
+  return res.json({
+    success: true,
+    token: signToken(user),
+    user: publicUser(user),
+  });
 };
 
 /**
- * Send email for resetting password
- * @param {Object} req - Request object containing user email
- * @param {Object} res - Response object to send JSON response
+ * Email a password reset link. Always answers the same way, so it can't be
+ * used to find out which emails have an account.
  */
 const forgotPassword = async (req, res) => {
-  try {
-    // Find user by email
-    const user = await User.findOne({ email: req.body.email });
+  const email = readString(req.body?.email, 'email', { required: true });
+  const user = await User.findOne({ email: email.toLowerCase() });
 
-    // If user not found, return error
-    if (!user) {
-      return res.status(404).json({ message: 'Utilisateur introuvable.' });
-    }
-
-    // Generate random token
-    const token = crypto.randomBytes(20).toString('hex');
-
-    // Update user with reset token and expiration time
-    user.resetPasswordToken = token;
-    user.resetPasswordExpires = Date.now() + 3600000; // Token expires in 1 hour
+  if (user) {
+    const { code, hash } = createCode();
+    user.resetPasswordToken = hash;
+    user.resetPasswordExpires = new Date(Date.now() + RESET_TOKEN_TTL);
     await user.save();
 
-    // Send reset password email
-    const template = forgotPasswordEmailTemplate(
-      user.fullName,
-      user.email,
-      API_ENDPOINT,
-      token,
-    );
-
-    const data = {
-      from: FROM_EMAIL,
+    await sendEmail({
       to: user.email,
-      subject: 'Réinitialisation de votre mot de passe',
-      html: template,
-    };
-
-    await sendEmail(data);
-
-    return res.json({
-      message: "Veuillez vérifier votre e-mail pour plus d'instructions",
+      subject: 'Reset your password',
+      html: forgotPasswordEmailTemplate(
+        user.fullName,
+        user.email,
+        API_ENDPOINT,
+        code,
+      ),
     });
-  } catch (error) {
-    return res
-      .status(500)
-      .json({ message: 'Une erreur est survenue.', error: error.message });
   }
+
+  return res.json({ success: true, message: GENERIC_EMAIL_MESSAGE });
 };
 
 /**
- * Reset user password
- * @param {Object} req - Request object containing token and new password
- * @param {Object} res - Response object to send JSON response
+ * Set a new password with a valid reset token.
  */
 const resetPassword = async (req, res) => {
-  try {
-    // Find user by reset password token and check expiration
-    const user = await User.findOne({
-      resetPasswordToken: req.params.token,
-      resetPasswordExpires: { $gt: Date.now() },
-    });
-
-    // If user not found or token expired, return error
-    if (!user) {
-      return res.status(400).json({
-        message:
-          'Le jeton de réinitialisation de mot de passe est invalide ou a expiré.',
-      });
-    }
-
-    // Check if new password matches verification password
-    if (req.body.newPassword !== req.body.verifyPassword) {
-      return res
-        .status(422)
-        .json({ message: 'Le mot de passe ne correspondent pas.' });
-    }
-
-    // Update user's password and clear reset token fields
-    user.password = req.body.newPassword;
-    user.resetPasswordToken = undefined;
-    user.resetPasswordExpires = undefined;
-    await user.save();
-
-    // Send password reset confirmation email
-    const template = resetPasswordConfirmationEmailTemplate(user.fullName);
-    const data = {
-      to: user.email,
-      from: FROM_EMAIL,
-      subject: 'Confirmation de réinitialisation du mot de passe',
-      html: template,
-    };
-
-    await sendEmail(data);
-
-    return res.json({ message: 'Mot de passe réinitialisé avec succès.' });
-  } catch (error) {
-    return res
-      .status(500)
-      .json({ message: 'Une erreur est survenue.', error: error.message });
+  const token = readString(req.params.token, 'token', { required: true });
+  const newPassword = readPassword(req.body?.newPassword, 'newPassword');
+  if (newPassword !== req.body?.verifyPassword) {
+    throw new HttpError(422, 'Passwords do not match');
   }
+
+  const user = await User.findOne({
+    resetPasswordToken: hashToken(token),
+    resetPasswordExpires: { $gt: new Date() },
+  });
+  if (!user) {
+    throw new HttpError(400, 'This reset link is invalid or has expired');
+  }
+
+  user.password = newPassword;
+  user.resetPasswordToken = undefined;
+  user.resetPasswordExpires = undefined;
+  await user.save();
+
+  await sendEmail({
+    to: user.email,
+    subject: 'Your password was changed',
+    html: resetPasswordConfirmationEmailTemplate(user.fullName),
+  });
+
+  return res.json({ success: true, message: 'Your password was reset' });
 };
 
 module.exports = {
   signUp,
+  confirmAccount,
+  resendConfirmation,
   signIn,
   adminSignIn,
   forgotPassword,

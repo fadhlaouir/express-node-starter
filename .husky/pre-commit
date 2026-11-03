@@ -1,8 +1,2 @@
-#!/usr/bin/env sh
-
-# Source Husky
-. "$(dirname -- "$0")/_/husky.sh"
-
-# Run prepush script
-npm run prepush
-
+# Lint and format only the staged files
+npx lint-staged

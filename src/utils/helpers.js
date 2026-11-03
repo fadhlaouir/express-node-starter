@@ -1,58 +1,59 @@
 /* -------------------------------------------------------------------------- */
 /*                                Dependencies                                */
 /* -------------------------------------------------------------------------- */
-// Dependencies
 const nodemailer = require('nodemailer');
-
-// Environment variables
-const {
-  MAILER_EMAIL_ID: FROM_EMAIL,
-  MAILER_PASSWORD: AUTH_PASSWORD,
-  NODE_ENV,
-  PRODUCTION_CLIENT_URL,
-  DEVELOPMENT_CLIENT_URL,
-  HOST,
-  SECURE,
-  PORT_SSL,
-  MAILER_SERVICE_PROVIDER,
-} = process.env;
+const { env } = require('../config/env');
 
 /* -------------------------------------------------------------------------- */
-/*                                   HELPERS                                  */
+/*                                   Helpers                                  */
 /* -------------------------------------------------------------------------- */
-// API endpoint
-const API_ENDPOINT =
-  NODE_ENV === 'production' ? PRODUCTION_CLIENT_URL : DEVELOPMENT_CLIENT_URL;
 
-// SMTP transporter configuration
-const smtpTransport = nodemailer.createTransport({
-  host: HOST,
-  port: PORT_SSL,
-  secure: SECURE,
-  service: MAILER_SERVICE_PROVIDER,
-  auth: {
-    user: FROM_EMAIL,
-    pass: AUTH_PASSWORD,
-  },
-});
+// Front-end URL used in email links
+const API_ENDPOINT = env.clientUrl;
+
+const { mailer } = env;
+const isMailerConfigured = Boolean(mailer.user && mailer.password);
+
+// The transporter is created only when the mailer is configured.
+const smtpTransport = isMailerConfigured
+  ? nodemailer.createTransport({
+      host: mailer.host,
+      port: mailer.port,
+      secure: mailer.secure,
+      service: mailer.service,
+      auth: { user: mailer.user, pass: mailer.password },
+    })
+  : null;
+
+// In tests, sent emails are kept here so tests can read the links they contain.
+const outbox = [];
 
 /**
- * Send email using SMTP transporter
- * @param {Object} data - Email data including from, to, subject, and html
- * @returns {Promise} Promise indicating success or failure of email sending
+ * Send an email. Without a configured mailer, the email is skipped; outside
+ * production its subject and recipient are logged so you can test locally.
+ * @param {{ to: string, subject: string, html: string }} data
+ * @returns {Promise<void>}
  */
-const sendEmail = (data) => {
-  return new Promise((resolve, reject) => {
-    smtpTransport.sendMail(data, (err) => {
-      if (err) reject(err); // Reject with error
-      else resolve(); // Resolve if successful
-    });
-  });
+const sendEmail = async (data) => {
+  if (env.isTest) {
+    outbox.push(data);
+    return;
+  }
+  if (!smtpTransport) {
+    if (!env.isProduction && !env.isTest) {
+      const link = /href="([^"]+)"/.exec(data.html)?.[1];
+      console.log(
+        `[mailer not configured] "${data.subject}" to ${data.to}${link ? `: ${link}` : ''}`,
+      );
+    }
+    return;
+  }
+  await smtpTransport.sendMail({ from: mailer.user, ...data });
 };
 
-// export module
 module.exports = {
   API_ENDPOINT,
   smtpTransport,
   sendEmail,
+  outbox,
 };

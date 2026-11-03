@@ -1,237 +1,209 @@
-# REST API Developed with Node.js, Express, MongoDB, Multer and nodemailer Boilerplate
+# Express Node Starter
 
-[![Author](http://img.shields.io/badge/author-@rfadhlaoui-blue.svg)](https://tn.linkedin.com/in/fadhlaouiraed)
+A secure REST API starter with Express 5, MongoDB and JWT authentication. Clone it, fill in `.env`, and start building your own endpoints, or generate them with the built-in CRUD CLI.
+
+[![CI](https://github.com/fadhlaouir/express-node-starter/actions/workflows/ci.yml/badge.svg)](https://github.com/fadhlaouir/express-node-starter/actions/workflows/ci.yml)
 [![GitHub license](https://img.shields.io/github/license/fadhlaouir/express-node-starter.svg)](https://github.com/fadhlaouir/express-node-starter/blob/main/LICENSE)
-[![Downloads](https://img.shields.io/npm/dt/express-node-starter.svg)](https://www.npmjs.com/package/express-node-starter)
+[![Author](http://img.shields.io/badge/author-@rfadhlaoui-blue.svg)](https://tn.linkedin.com/in/fadhlaouiraed)
 
-## Overview
-
-This project provides a robust API skeleton written in JavaScript ES6, suitable for any project. It offers features such as authentication, authorization, JWT tokens, role management, CRUD operations, email notifications, and more. Additionally, it automates the generation of CRUD (Create, Read, Update, Delete) operations for entities within a MongoDB database, streamlining the development process for Node.js applications built on top of Express.js.
+> Want a fresh project in one command? Use [create-express-node-starter](https://github.com/fadhlaouir/create-express-node-starter): `npx create-express-node-starter`.
 
 ## Table of Contents
 
-- [Getting Started](#getting-started)
 - [Features](#features)
-- [Software Requirements](#software-requirements)
-- [Engines](#engines)
-- [How to Install](#how-to-install)
-- [Setting up Environments](#setting-up-environments)
+- [Requirements](#requirements)
+- [Getting Started](#getting-started)
+- [Environment Variables](#environment-variables)
+- [API](#api)
 - [Project Structure](#project-structure)
-- [How to Run](#how-to-run)
-- [CLI Commands](#cli-commands)
-- [Linting and Formatting](#linting-and-formatting)
+- [Generating CRUD Operations](#generating-crud-operations)
+- [Testing, Linting and Formatting](#testing-linting-and-formatting)
+- [Running with Docker](#running-with-docker)
+- [Security](#security)
+- [Upgrading from 1.x](#upgrading-from-1x)
 - [Bugs or Improvements](#bugs-or-improvements)
 - [License](#license)
-- [Credits](#credits)
-- [Support](#support)
-
-## Getting started
-
-This is a basic API skeleton written in JavaScript ES6.
-
-This project will run on **NodeJs** using **MongoDB** as database.
-
-API Documentation [Swagger]
 
 ## Features
 
-- Authentication and Authorization
-- JWT Tokens, make requests with a token after login with `Authorization` header with value `Bearer yourToken` where `yourToken` will be returned in the Login response.
-- Role Manage
-- Update Profile/Password User Account
-- Upload Image with multer
-- Reset Password Mail using `nodemailer`
-- Pre-defined response structures with proper status codes.
-- Included CORS.
-- System notification with Firebase
-- Email Template and settings
-- Validations added.
-- Included API collection for Postman.
-- Light-weight project.
-- Linting with [Eslint](https://eslint.org/). (Airbnb style)
-- Included CLI for generating CRUD operations.
-- husky for pre-commit hooks and lint-staged for running linters on git staged files.
+- **Authentication:** sign-up with email confirmation, sign-in, password reset by email, and changing your password.
+- **Roles:** `is_user`, `is_manager` and `is_admin`, with a separate back-office sign-in for staff.
+- **JWT tokens:** send `Authorization: Bearer <token>`; tokens hold only the user id and role.
+- **Users:** profile with photo upload, paginated list for staff, self-service delete.
+- **Uploads:** images only (JPEG, PNG, GIF, WebP), 5 MB maximum, stored under random names.
+- **Security by default:** Helmet headers, rate limits on auth routes, NoSQL-injection-safe input, hashed passwords and email codes. See [Security](#security).
+- **API docs:** Swagger UI at `/api-docs/`, from an OpenAPI 3 spec.
+- **Health check** at `/health`, and graceful shutdown.
+- **CRUD generator:** `npm run crud:operation -- generate product` writes a working model, controller and routes.
+- **Tests:** 29 integration tests with an in-memory MongoDB; no database to install.
+- **Tooling:** ESLint, Prettier, Husky and lint-staged, conventional-commit releases, Docker and GitHub Actions CI.
 
-## Software Requirements
+## Requirements
 
-- Node.js **16+**
-- MongoDB **4+**
+- Node.js **22.13 or later** (22 and 24 LTS are tested)
+- MongoDB **6 or later**, local or hosted (for example MongoDB Atlas), or Docker
 
-### Engines
-
-- node **>=14.16.0 <=20.11.0**
-- npm **>=6.14.11 <=10.2.4**
-
-## How to install
-
-### Using Git (recommended)
-
-1.  Clone the project from github.
+## Getting Started
 
 ```bash
 git clone https://github.com/fadhlaouir/express-node-starter.git
-```
-
-### Using manual download ZIP
-
-1.  Download repository
-2.  Uncompress to your desired directory
-
-### Install npm dependencies after installing (Git or manual download)
-
-```bash
 cd express-node-starter
 npm install
+cp .env.example .env
 ```
 
-## Setting up environments
+Set `SECRET` in `.env` to a long random string:
 
-1.  You will find a file named `.env.example` on root directory of project.
-2.  Create a new file by copying and pasting the file and then renaming it to just `.env`
-    ```bash
-    cp .env.example .env
-    ```
-3.  The file `.env` is already ignored, so you never commit your credentials.
-4.  Change the values of the file to your environment. Helpful comments added to `.env.example` file to understand the constants.
+```bash
+node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"
+```
 
-## Project structure
+Then start the API:
+
+```bash
+npm run dev     # restarts on file changes
+npm start       # without watching
+```
+
+```bash
+Connected to the database
+Listening on PORT 5000
+```
+
+Open [http://localhost:5000/api-docs/](http://localhost:5000/api-docs/) to try every endpoint.
+
+**No mailer yet?** Leave `MAILER_EMAIL_ID` empty: the API skips sending and prints the confirmation and reset links in the console, so you can test the whole flow locally.
+
+## Environment Variables
+
+All of them are in [`.env.example`](.env.example). `npm start` and `npm run dev` load `.env` with Node's built-in `--env-file`; in production, set real environment variables.
+
+| Variable                                                                                      | Required    | Purpose                                                  |
+| --------------------------------------------------------------------------------------------- | ----------- | -------------------------------------------------------- |
+| `DEV_DATABASE` / `PROD_DATABASE`                                                              | Yes         | MongoDB connection string, chosen by `NODE_ENV`          |
+| `SECRET`                                                                                      | Yes         | JWT signing secret; at least 32 characters in production |
+| `JWT_EXPIRES_IN`                                                                              | No (`7d`)   | Token lifetime                                           |
+| `PORT`                                                                                        | No (`5000`) | HTTP port                                                |
+| `DEVELOPMENT_CLIENT_URL` / `PRODUCTION_CLIENT_URL`                                            | For emails  | Your front end, used in confirmation and reset links     |
+| `CORS_ORIGIN`                                                                                 | No (`*`)    | Allowed origins, comma-separated                         |
+| `AUTH_RATE_LIMIT`                                                                             | No (`20`)   | Requests per IP per 15 minutes on public auth routes     |
+| `MAILER_EMAIL_ID`, `MAILER_PASSWORD`, `MAILER_SERVICE_PROVIDER`, `HOST`, `PORT_SSL`, `SECURE` | For emails  | SMTP settings for nodemailer                             |
+
+The server refuses to start without a database URL or `SECRET`, and tells you which one is missing.
+
+## API
+
+Everything is under `/v1/api`. Full request and response shapes are in Swagger at `/api-docs/`.
+
+| Method | Path                          | Access                | Description                                |
+| ------ | ----------------------------- | --------------------- | ------------------------------------------ |
+| POST   | `/auth/register`              | Public                | Create an account (photo optional)         |
+| POST   | `/auth/confirm/:code`         | Public                | Activate the account from the email link   |
+| POST   | `/auth/resend-confirmation`   | Public                | Send a new confirmation email              |
+| POST   | `/auth/login`                 | Public                | Sign in, returns a token                   |
+| POST   | `/auth/admin/login`           | Admins and managers   | Back-office sign-in                        |
+| POST   | `/auth/forget-password`       | Public                | Email a reset link                         |
+| POST   | `/auth/reset-password/:token` | Public                | Set a new password                         |
+| POST   | `/users/check-email`          | Public                | Whether an email is registered             |
+| GET    | `/users`                      | Admins and managers   | Paginated list: `?page=1&limit=20`         |
+| GET    | `/users/me`                   | Signed in             | The signed-in user                         |
+| PUT    | `/users/me/password`          | Signed in             | Change password (needs the current one)    |
+| GET    | `/users/:id`                  | The user, or staff    | One user                                   |
+| PUT    | `/users/:id`                  | The user, or staff    | Update name and photo; admins can set role |
+| DELETE | `/users/:id`                  | The user, or an admin | Delete the account                         |
+
+Responses share one shape: `{ "success": true, ... }`, or `{ "success": false, "message": "..." }` with a matching HTTP status.
+
+**Email links** point to your front end (`/account/:code/enable` and `/auth/reset-password/:token`). Your front end reads the code from the URL and calls the matching API route.
+
+## Project Structure
 
 ```sh
 .
-├── .husky
-│   ├── _
-│   │   ├── .gitignore
-│   │   └── husky.sh
-│   ├── pre-commit
-│   └── pre-push
-├── cli
-│   ├── _
-│   │   ├── deleteCrud.js
-│   │   ├── generateEmptyCrud.js
-│   │   ├── generateMinimalCrud.js
-│   │   └── helpers.js
-│   ├── index.js
-│   └── README.md
-├── src
-│   ├── controllers
-│   │   ├── auth.controller.js
-│   │   └── user.controller.js
-│   ├── middlewares
-│   │   ├── multer.js
-│   │   └── verify-token.js
-│   ├── models
-│   │   └── user.model.js
-│   ├── routes
-│   │   ├── auth.route.js
-│   │   └── user.route.js
-│   ├── template
-│   │   └── userAccountEmailTemplates.js
-│   ├── utils
-│   │   └── helpers.js
-│   └── swagger.json
-├── .commitlintrc.json
-├── .editorconfig
-├── .env
-├── .env.example
-├── .eslintignore.json
-├── .eslintrc.json
-├── .gitignore
-├── .prettierignore.json
-├── .prettierrc.json
-├── CHANGELOG.md
-├── LICENSE
-├── package.json
-├── README.md
-└── server.js
-
+├── cli/                     # CRUD generator (npm run crud:operation)
+├── src/
+│   ├── app.js               # Express app: middleware, routes, errors
+│   ├── docs.js              # Swagger UI at /api-docs
+│   ├── swagger.json         # OpenAPI 3 spec
+│   ├── config/              # Environment and database
+│   ├── controllers/         # Request handlers
+│   ├── middlewares/         # Auth, roles, uploads, rate limits, errors
+│   ├── models/              # Mongoose models
+│   ├── routes/              # Route files, registered automatically by index.js
+│   ├── template/            # Email templates
+│   └── utils/               # Mailer and request helpers
+├── test/                    # Integration tests (node:test + in-memory MongoDB)
+├── server.js                # Starts the server and shuts it down gracefully
+├── Dockerfile
+└── docker-compose.yml
 ```
 
-## How to run
+**Adding an endpoint:** create `src/routes/<name>.route.js` exporting an Express router. `src/routes/index.js` registers every `*.route.js` file, so nothing else needs editing. Controllers can `throw new HttpError(status, message)` (from `src/utils/request.js`): Express 5 sends it to the error handler.
 
-### Running API server locally
-
-If you would like to run the API server on your local environment, you can do so by running the following command:
-Windows OS
+## Generating CRUD Operations
 
 ```bash
-npm run develop
+npm run crud:operation                              # interactive menu
+npm run crud:operation -- generate product          # working CRUD with name and description
+npm run crud:operation -- generate product --type empty
+npm run crud:operation -- delete product --yes
 ```
 
-Linux OS or Mac OS
+The generated routes are `/v1/api/products` and `/v1/api/products/:id`; creating, updating and deleting require a token. See the [CLI README](cli/README.md).
+
+## Testing, Linting and Formatting
 
 ```bash
-npm run develop:mac
-```
-
-```bash
-Connected to the database:YOUR_DB_CONNECTION_STRING
-App is running ...
-
-Press CTRL + C to stop the process.
-```
-
-**Note:**
-
-`YOUR_DEVELOPMENT_DB_CONNECTION_STRING` will be your MongoDB connection string for `development` environment.
-
-`YOUR_PRODUCTION_DB_CONNECTION_STRING` will be your MongoDB connection string for `production` environment.
-
-### Creating new models
-
-If you need to add more models to the project just create a new file in `src/models/` and use them in the controllers.
-
-### Creating new routes
-
-If you need to add more routes to the project just create a new file in `src/routes/` and import it in `src/app` to be loaded.
-
-### Creating new controllers
-
-If you need to add more controllers to the project just create a new file in `src/controllers/` and use them in the routes.
-
-## Using the CLI to generate CRUD operations
-
-1. Navigate to the project directory.
-2. Run the following command:
-
-```bash
-npm run crud:operation
-```
-
-See the [CLI README](cli/README.md) section for more details on how to use the CLI to generate or delete CRUD operations.
-
-Follow the prompts to select the CRUD type (empty or minimal) and provide the entity name. The tool will generate the necessary files for the CRUD operations based on your selection.
-
-## Linting and Formatting
-
-### Running Eslint
-
-```bash
-npm run lint:check
-```
-
-### Fixing Eslint errors
-
-```bash
+npm test               # integration tests, with an in-memory MongoDB
+npm run lint           # ESLint
 npm run lint:fix
-```
-
-### Prettier for code formatting
-
-```bash
+npm run format:check   # Prettier
 npm run format:fix
 ```
 
-You can set custom rules for eslint in `.eslintrc.json` file, Added at project root.
+Husky runs ESLint and Prettier on staged files before each commit, and lint and format checks before each push. GitHub Actions runs everything on Node 22 and 24.
 
-## Bugs or improvements
+## Running with Docker
 
-Every project needs improvements, Feel free to report any bugs or improvements. Pull requests are always welcome.
+```bash
+SECRET=$(node -e "console.log(require('crypto').randomBytes(48).toString('hex'))") docker compose up --build
+```
+
+This starts the API on port 5000 and MongoDB 8, with uploads and data in Docker volumes. The image runs as an unprivileged user and has a health check.
+
+## Security
+
+- Passwords are hashed with bcrypt. Confirmation and reset codes are random, single-use, and stored only as SHA-256 hashes; reset links expire after one hour.
+- Sign-up never accepts a role or an activation flag from the request. Only admins can change roles.
+- Users can read, update and delete only their own account; staff permissions are explicit per route.
+- Request fields are checked as strings, so `{ "$ne": null }`-style query injection is rejected.
+- Sign-in and password-reset answers don't reveal which emails have accounts.
+- Uploads accept images only, get random file names, and are served from a folder that can't be escaped.
+- Public auth routes are rate limited, and Helmet sets security headers.
+- Error responses never include stack traces or internal messages in production.
+
+Found a vulnerability? Please report it privately: see the [security policy](SECURITY.md).
+
+## Upgrading from 1.x
+
+Version 2 fixes security issues in 1.x. If you started a project from 1.x, compare it with this version, in particular:
+
+- **Roles:** `POST /auth/register` used to accept `role` and `is_active`, so anyone could register as an admin.
+- **Tokens:** tokens used to contain the whole user, including the password hash.
+- **Access:** any signed-in user could read, update or delete any other user, and `PUT /users/:id` could store a plain-text password.
+- **Uploads:** `GET /uploads/:id` could read files outside the upload folder, and uploads accepted any file type.
+
+Other changes: Node.js 22+, Express 5, Mongoose 9; `npm run develop` is now `npm run dev`; failed sign-ins return `401`; new routes for account confirmation and password change; `dotenv`, `nodemon` and `swagger-ui-express` are no longer needed.
+
+## Bugs or Improvements
+
+Every project needs improvements. Feel free to report any bugs or improvements; pull requests are always welcome. Please read the [code of conduct](CODE_OF_CONDUCT.md).
 
 Found a security issue? Please don't open a public issue: see the [security policy](SECURITY.md).
 
 ## License
 
-This project is open-sourced software licensed under the MIT License. See the LICENSE file for more information.
+This project is open-sourced software licensed under the [MIT License](LICENSE).
 
 ## Credits
 

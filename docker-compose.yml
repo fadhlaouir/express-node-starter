@@ -1,0 +1,26 @@
+# Run the API and MongoDB: docker compose up --build
+# Set SECRET in your shell or in a .env file next to this one first.
+services:
+  api:
+    build: .
+    ports:
+      - '5000:5000'
+    environment:
+      NODE_ENV: production
+      PROD_DATABASE: mongodb://mongo:27017/express-node-starter
+      SECRET: ${SECRET:?Set SECRET to a random string of at least 32 characters}
+      PRODUCTION_CLIENT_URL: ${PRODUCTION_CLIENT_URL:-http://localhost:3000}
+      CORS_ORIGIN: ${CORS_ORIGIN:-*}
+    volumes:
+      - uploads:/app/uploads
+    depends_on:
+      - mongo
+
+  mongo:
+    image: mongo:8
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  uploads:
+  mongo-data:

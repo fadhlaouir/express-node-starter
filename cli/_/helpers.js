@@ -1,13 +1,30 @@
 /* -------------------------------------------------------------------------- */
 /*                                DEPENDENCIES                                */
 /* -------------------------------------------------------------------------- */
-// packages
-const path = require('path');
-const fs = require('fs').promises;
+const fs = require('node:fs');
+const path = require('node:path');
 
 /* -------------------------------------------------------------------------- */
 /*                              Helper functions                              */
 /* -------------------------------------------------------------------------- */
+// The generator works on the project in the current directory (run it with `npm run crud:operation`).
+const SRC = path.join(process.cwd(), 'src');
+
+/**
+ * Validate an entity name: letters, digits and underscores, starting with a letter.
+ * The name becomes part of file paths, so nothing else is accepted.
+ * @param {string} input
+ * @returns {string} The trimmed name
+ */
+function validateEntityName(input) {
+  const entity = String(input ?? '').trim();
+  if (!/^[a-zA-Z][a-zA-Z0-9_]*$/.test(entity)) {
+    throw new Error(
+      'Entity name must start with a letter and contain only letters, numbers and underscores',
+    );
+  }
+  return entity;
+}
 
 /**
  * Capitalizes the first character of the entity name.
@@ -19,28 +36,29 @@ function capitalizeEntity(entity) {
 }
 
 /**
- * Checks if the entity already exists in the project.
- * If the entity already exists, it logs a message and exits the process.
- * @param {string} entity - The entity name
- * @returns {boolean} - Returns true if the entity exists, false otherwise
+ * Paths of the three files generated for an entity.
+ * @param {string} entity
  */
-async function isEntityExists(entity) {
-  // Capitalize the entity name
-  const ENTITY = capitalizeEntity(entity);
+function entityFiles(entity) {
+  return {
+    model: path.join(SRC, 'models', `${entity}.model.js`),
+    controller: path.join(SRC, 'controllers', `${entity}.controller.js`),
+    route: path.join(SRC, 'routes', `${entity}.route.js`),
+  };
+}
 
-  // Construct the file path for the model file
-  const modelFilePath = path.join('src', 'models', `${ENTITY}.model.js`);
-
-  try {
-    // Check if the model file exists
-    await fs.access(modelFilePath);
-    return true; // Model file exists
-  } catch (error) {
-    return false; // Model file does not exist
-  }
+/**
+ * Whether any file of the entity already exists.
+ * @param {string} entity
+ * @returns {boolean}
+ */
+function isEntityExists(entity) {
+  return Object.values(entityFiles(entity)).some((file) => fs.existsSync(file));
 }
 
 module.exports = {
+  validateEntityName,
   capitalizeEntity,
+  entityFiles,
   isEntityExists,
 };

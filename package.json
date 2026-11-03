@@ -1,79 +1,83 @@
 {
   "name": "express-node-starter",
   "version": "1.11.0",
+  "description": "Secure Express 5 and MongoDB starter for REST APIs: JWT authentication, roles, account confirmation, password reset, uploads, Swagger docs, tests and a CRUD generator.",
   "main": "server.js",
-  "author": "@Raed Fadhlaoui <raed.fadhlaoui@hotmail.com>",
-  "description": "Express, MongoDB, Firebase, and Swagger for API documentation starter for building RESTful APIs",
+  "author": "Raed Fadhlaoui <raed.fadhlaoui@hotmail.com>",
   "license": "MIT",
-  "bin": {
-    "crud:operation": "cli/index.js"
-  },
-  "scripts": {
-    "start": "NODE_ENV=production && node server.js",
-    "develop": "SET NODE_ENV=development && nodemon server.js",
-    "develop:mac": "NODE_ENV=development && nodemon server.js",
-    "crud:operation": "node cli/index.js generate",
-    "lint:check": "eslint --ext .js,.jsx,.ts,.tsx .",
-    "format:check": "prettier --check .",
-    "lint:fix": "eslint --ext .js,.jsx,.ts,.tsx --fix .",
-    "format:fix": "prettier --write .",
-    "release": "standard-version",
-    "release:minor": "standard-version --release-as minor",
-    "release:major": "standard-version --release-as major",
-    "release:dry": "standard-version --dry-run",
-    "prepush": "npm run format:fix && npm run lint:check && npm run format:check",
-    "prepare": "husky install"
-  },
+  "homepage": "https://github.com/fadhlaouir/express-node-starter#readme",
+  "bugs": "https://github.com/fadhlaouir/express-node-starter/issues",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/fadhlaouir/express-node-starter.git"
   },
+  "funding": "https://www.buymeacoffee.com/fadhlaouir",
   "keywords": [
-    "node.js",
-    "express.js",
-    "swagger",
+    "express",
+    "express5",
     "mongodb",
-    "restful-api"
+    "mongoose",
+    "rest-api",
+    "jwt",
+    "authentication",
+    "starter",
+    "boilerplate",
+    "swagger"
   ],
+  "files": [
+    "server.js",
+    "src/",
+    "cli/",
+    ".env.example",
+    "Dockerfile",
+    "docker-compose.yml"
+  ],
+  "scripts": {
+    "start": "node --env-file-if-exists=.env server.js",
+    "dev": "node --watch --env-file-if-exists=.env server.js",
+    "test": "node --test --test-concurrency=1 \"test/**/*.test.js\"",
+    "lint": "eslint .",
+    "lint:fix": "eslint --fix .",
+    "format:check": "prettier --check .",
+    "format:fix": "prettier --write .",
+    "crud:operation": "node cli/index.js",
+    "release": "commit-and-tag-version",
+    "release:minor": "commit-and-tag-version --release-as minor",
+    "release:major": "commit-and-tag-version --release-as major",
+    "release:dry": "commit-and-tag-version --dry-run",
+    "prepare": "husky"
+  },
   "dependencies": {
-    "async": "^3.2.3",
-    "babel-eslint": "^10.1.0",
-    "bcrypt-nodejs": "0.0.3",
-    "body-parser": "^1.19.0",
-    "commander": "^12.0.0",
-    "cors": "^2.8.5",
-    "crypto": "^1.0.1",
-    "dotenv": "^8.2.0",
-    "esm": "^3.2.25",
-    "express": "^4.17.1",
-    "fs-extra": "^11.2.0",
-    "inquirer": "^8.0.0",
-    "install": "^0.13.0",
-    "jsonwebtoken": "^9.0.2",
-    "lodash": "^4.17.21",
-    "mongoose": "^6.2.4",
-    "morgan": "^1.10.0",
-    "multer": "^1.4.2",
-    "nodemailer": "^6.7.3",
-    "nodemon": "^3.1.0",
-    "npm": "^10.5.0",
-    "prettier": "^2.6.2",
-    "standard-version": "^9.3.2",
-    "swagger-ui-express": "^4.3.0"
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.6",
+    "express": "^5.3.0",
+    "express-rate-limit": "^8.7.3",
+    "helmet": "^8.3.0",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.11.4",
+    "morgan": "^1.12.1",
+    "multer": "^2.5.0",
+    "nodemailer": "^10.3.1"
   },
   "devDependencies": {
-    "eslint": "^7.5.0",
-    "husky": "^8.0.0",
-    "lint-staged": "^15.2.2"
+    "@eslint/js": "^10.0.1",
+    "commit-and-tag-version": "^13.3.0",
+    "eslint": "^10.14.0",
+    "globals": "^17.14.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.4.0",
+    "mongodb-memory-server": "^11.3.0",
+    "prettier": "^3.9.10",
+    "supertest": "^7.3.1"
   },
   "lint-staged": {
-    "*.{js,jsx,ts,tsx}": [
+    "*.js": [
       "eslint --fix",
       "prettier --write"
-    ]
+    ],
+    "*.{json,md,yml,yaml}": "prettier --write"
   },
   "engines": {
-    "node": ">=14.16.0 <=20.11.0",
-    "npm": ">=6.14.11 <=10.2.4"
+    "node": ">=22.13.0"
   }
 }

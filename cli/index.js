@@ -2,166 +2,130 @@
 /* -------------------------------------------------------------------------- */
 /*                                DEPENDENCIES                                */
 /* -------------------------------------------------------------------------- */
-// Required packages
-const inquirer = require('inquirer'); // For prompting user input
-const util = require('util');
-const exec = util.promisify(require('child_process').exec); // For executing shell commands
+const path = require('node:path');
+const readline = require('node:readline/promises');
+const { parseArgs } = require('node:util');
 
-// Local helpers and functions
-const { generateEmptyCrud } = require('./_/generateEmptyCrud'); // Function to generate empty CRUD
-const { generateMinimalCrud } = require('./_/generateMinimalCrud'); // Function to generate minimal CRUD
-const { deleteCrud } = require('./_/deleteCrud'); // Function to delete CRUD
-const { isEntityExists } = require('./_/helpers'); // Function to check if entity already exists
+const { generateMinimalCrud } = require('./_/generateMinimalCrud');
+const { generateEmptyCrud } = require('./_/generateEmptyCrud');
+const { deleteCrud } = require('./_/deleteCrud');
+const { validateEntityName, isEntityExists } = require('./_/helpers');
 
 /* -------------------------------------------------------------------------- */
-/*                                  CONSTANTS                                 */
+/*                                    Usage                                   */
 /* -------------------------------------------------------------------------- */
-const LOADING_EMOJI = '⏳'; // Loading emoji
+const usage = `Generate or delete CRUD files for an entity.
+
+Usage:
+  npm run crud:operation                                    Interactive menu
+  npm run crud:operation -- generate <name> [--type minimal|empty]
+  npm run crud:operation -- delete <name> [--yes]
+
+  minimal (default): model with name and description, working CRUD logic
+  empty: model and handlers to fill in yourself
+
+Routes are registered automatically: no other file needs editing.`;
 
 /* -------------------------------------------------------------------------- */
-/*                                   MAIN                                     */
+/*                                   Actions                                  */
 /* -------------------------------------------------------------------------- */
-/**
- * Main function to handle the CLI input for generating or deleting CRUD operations.
- * It prompts the user for the action to perform and handles the corresponding action.
- * @returns {Promise<void>} - A Promise that resolves when the action is performed successfully
- */
+const relative = (files) =>
+  files.map((file) => `  ${path.relative(process.cwd(), file)}`).join('\n');
+
+async function generate(name, type = 'minimal') {
+  const entity = validateEntityName(name);
+  if (!['minimal', 'empty'].includes(type)) {
+    throw new Error('--type must be minimal or empty');
+  }
+  if (isEntityExists(entity)) {
+    throw new Error(`Files for "${entity}" already exist`);
+  }
+  const files =
+    type === 'empty'
+      ? await generateEmptyCrud(entity)
+      : await generateMinimalCrud(entity);
+  console.log(
+    `✅ ${type} CRUD generated for "${entity}":\n${relative(files)}\n\nRestart the server: the routes /v1/api/${entity}s are ready.`,
+  );
+}
+
+async function remove(name, confirm) {
+  const entity = validateEntityName(name);
+  if (!isEntityExists(entity)) {
+    console.log(`No CRUD files found for "${entity}"`);
+    return;
+  }
+  if (!(await confirm(`Delete the CRUD files of "${entity}"? (y/N) `))) {
+    console.log('Deletion cancelled.');
+    return;
+  }
+  const files = await deleteCrud(entity);
+  console.log(`🗑️  Deleted:\n${relative(files)}`);
+}
+
+/* -------------------------------------------------------------------------- */
+/*                                    Main                                    */
+/* -------------------------------------------------------------------------- */
 async function main() {
+  const { values, positionals } = parseArgs({
+    allowPositionals: true,
+    options: {
+      type: { type: 'string', short: 't' },
+      yes: { type: 'boolean', short: 'y' },
+      help: { type: 'boolean', short: 'h' },
+    },
+  });
+  if (values.help) return console.log(usage);
+
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  });
+  // Read answers line by line, so piped input (scripts, CI) works like typing.
+  const lines = rl[Symbol.asyncIterator]();
+  const ask = async (question) => {
+    process.stdout.write(question);
+    const { value = '', done } = await lines.next();
+    if (done) process.stdout.write('\n');
+    return value.trim();
+  };
+  const confirm = async (question) =>
+    values.yes || /^y(es)?$/i.test(await ask(question));
+
   try {
-    // Interactive prompt for selecting action
-    const actionPrompt = {
-      type: 'list',
-      name: 'action',
-      message: 'Select action:',
-      choices: ['Generate CRUD', 'Delete CRUD', 'Exit'],
-    };
-
-    const { action } = await inquirer.prompt(actionPrompt);
-
-    switch (action) {
-      case 'Generate CRUD':
-        console.log(`${LOADING_EMOJI} Generating CRUD...`);
-        await generateCrud();
-        break;
-      case 'Delete CRUD':
-        console.log(`${LOADING_EMOJI} Deleting CRUD...`);
-        await deleteCrudAction();
-        break;
-      case 'Exit':
-        console.log('Exiting...');
-        process.exit(0);
-        break;
-      default:
-        console.log('Invalid action:', action);
-        process.exit(1);
+    let [action, name] = positionals;
+    if (!action) {
+      const choice = await ask(
+        'Select action:\n  1) Generate CRUD\n  2) Delete CRUD\n  3) Exit\n> ',
+      );
+      action = { 1: 'generate', 2: 'delete' }[choice];
+      if (!action) return console.log('Exiting...');
     }
-  } catch (error) {
-    // Handle errors
-    console.error('An error occurred:', error);
-    process.exit(1);
-  }
-}
-
-/**
- * Function to handle the CRUD generation process.
- * @returns {Promise<void>} - A Promise that resolves when CRUD is generated successfully
- */
-async function generateCrud() {
-  try {
-    // Prompt user to enter entity name
-    const entityPrompt = {
-      type: 'input',
-      name: 'entity',
-      message: 'Enter entity name:',
-      validate: async (input) => {
-        const trimmedInput = input.trim();
-        if (!trimmedInput) {
-          return 'Entity name cannot be empty';
-        }
-        if (!/^[a-zA-Z0-9_]+$/.test(trimmedInput)) {
-          return 'Entity name can only contain letters, numbers, and underscores';
-        }
-        const entityExists = await isEntityExists(trimmedInput);
-        if (entityExists) {
-          return `Entity "${trimmedInput}" already exists. Cannot generate CRUD.`;
-        }
-        return true;
-      },
-    };
-
-    const { entity } = await inquirer.prompt(entityPrompt);
-
-    const commandPrompt = {
-      type: 'list',
-      name: 'command',
-      message: 'Select CRUD type:',
-      choices: ['empty', 'minimal'],
-    };
-
-    const { command } = await inquirer.prompt(commandPrompt);
-
-    switch (command) {
-      case 'empty':
-        await generateEmptyCrud(entity);
-        console.log('✅ Empty CRUD generated successfully for entity:', entity);
-        break;
-      case 'minimal':
-        await generateMinimalCrud(entity);
-        console.log(
-          '✅ Minimal CRUD generated successfully for entity:',
-          entity,
-        );
-        break;
-      default:
-        console.log('Invalid command:', command);
-        process.exit(1);
+    if (!['generate', 'delete'].includes(action)) {
+      throw new Error(`Unknown action "${action}"\n\n${usage}`);
     }
+    if (!name) name = await ask('Entity name: ');
 
-    // Run 'npm run format:fix' after CRUD operations are performed
-    await exec('npm run format:fix');
-    console.log('✅ Formatting fixed.');
-    console.log('Exiting...');
-    process.exit(0);
-  } catch (error) {
-    console.error('An error occurred during CRUD generation:', error);
-    process.exit(1);
+    if (action === 'generate') {
+      let type = values.type;
+      if (!type && !positionals[1]) {
+        type =
+          (await ask('CRUD type, minimal or empty (minimal): ')) || 'minimal';
+      }
+      await generate(name, type);
+    } else {
+      await remove(name, confirm);
+    }
+  } finally {
+    rl.close();
   }
 }
 
-/**
- * Function to handle the CRUD deletion process.
- * @returns {Promise<void>} - A Promise that resolves when CRUD is deleted successfully
- */
-async function deleteCrudAction() {
-  try {
-    // Prompt user to enter entity name for deletion
-    const entityPrompt = {
-      type: 'input',
-      name: 'entity',
-      message: 'Enter entity name to delete CRUD:',
-      validate: async (input) => {
-        const trimmedInput = input.trim();
-        if (!trimmedInput) {
-          return 'Entity name cannot be empty';
-        }
-        return true;
-      },
-    };
-
-    const { entity } = await inquirer.prompt(entityPrompt);
-    await deleteCrud(entity);
-
-    console.log('Exiting...');
-    process.exit(0);
-  } catch (error) {
-    console.error('An error occurred during CRUD deletion:', error);
-    process.exit(1);
-  }
-}
-
-// Invoke main function if the script is run directly
 if (require.main === module) {
-  main();
+  main().catch((error) => {
+    console.error(`❌ ${error.message}`);
+    process.exitCode = 1;
+  });
 }
 
-module.exports = { generateCrud, deleteCrudAction };
+module.exports = { generate, remove };
