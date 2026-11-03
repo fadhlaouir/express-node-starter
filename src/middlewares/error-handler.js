@@ -1,7 +1,6 @@
 /* -------------------------------------------------------------------------- */
 /*                                Dependencies                                */
 /* -------------------------------------------------------------------------- */
-const multer = require('multer');
 const { env } = require('../config/env');
 
 /* -------------------------------------------------------------------------- */
@@ -23,7 +22,8 @@ const errorHandler = (err, req, res, next) => {
   let status = err.status || err.statusCode || 500;
   let message = err.message;
 
-  if (err instanceof multer.MulterError) {
+  // Matched by name so the handler works in projects without multer.
+  if (err.name === 'MulterError') {
     status = err.code === 'LIMIT_FILE_SIZE' ? 413 : 422;
   } else if (err.name === 'ValidationError') {
     status = 422;

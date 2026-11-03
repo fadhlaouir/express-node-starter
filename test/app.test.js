@@ -38,6 +38,18 @@ test('sign-up rejects files that are not images', async () => {
   assert.equal(res.status, 422);
 });
 
+test('uploads over 5 MB are rejected with 413', async () => {
+  const res = await agent
+    .post('/v1/api/auth/register')
+    .field('email', 'big@example.com')
+    .field('password', 'password123')
+    .attach('photo', Buffer.alloc(5 * 1024 * 1024 + 1), {
+      filename: 'big.png',
+      contentType: 'image/png',
+    });
+  assert.equal(res.status, 413);
+});
+
 test('sign-up stores an image under a random name', async () => {
   const png = Buffer.from(
     'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==',
