@@ -136,3 +136,41 @@ test('admin login refuses regular users', async () => {
     .send({ email: admin.email, password: 'password123' });
   assert.equal(ok.status, 200);
 });
+
+test('sign-up refuses an address that is not an email', async () => {
+  for (const email of [
+    'not-an-email',
+    'a@b',
+    'two@@example.com',
+    'sp ace@example.com',
+    `${'a'.repeat(250)}@example.com`,
+  ]) {
+    const res = await agent
+      .post('/v1/api/auth/register')
+      .send({ email, password: 'password123' });
+    assert.equal(res.status, 422, email);
+  }
+});
+
+test('sign-up refuses a password longer than bcrypt reads', async () => {
+  // bcrypt reads 72 bytes: a longer password would match on its first 72 alone
+  const res = await agent
+    .post('/v1/api/auth/register')
+    .send({ email: 'long@example.com', password: 'a'.repeat(73) });
+  assert.equal(res.status, 422);
+  // Bytes, not letters: 37 two-byte letters are 74 bytes
+  const accented = await agent
+    .post('/v1/api/auth/register')
+    .send({ email: 'accent@example.com', password: 'é'.repeat(37) });
+  assert.equal(accented.status, 422);
+  await agent
+    .post('/v1/api/auth/register')
+    .send({ email: 'max@example.com', password: 'a'.repeat(72) })
+    .expect(201);
+});
+
+test('an email is matched whatever its case', async () => {
+  const user = await createUser({ email: 'mixed@example.com' });
+  assert.ok(await login(agent, 'MiXeD@Example.COM'));
+  assert.equal(user.email, 'mixed@example.com');
+});

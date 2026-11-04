@@ -11,7 +11,12 @@ const { hashToken } = require('../models/user.model');
 // Helpers
 const { env } = require('../config/env');
 const { API_ENDPOINT, sendEmail } = require('../utils/helpers');
-const { HttpError, readString, readPassword } = require('../utils/request');
+const {
+  HttpError,
+  readString,
+  readEmail,
+  readPassword,
+} = require('../utils/request');
 const { STAFF_ROLES } = require('../middlewares/authorize');
 const { toPublicPath, removeUpload } = require('../middlewares/multer');
 const {
@@ -82,14 +87,12 @@ const sendConfirmationEmail = (user, code) =>
  * @param {import('express').Request} req
  */
 const authenticate = async (req) => {
-  const email = readString(req.body?.email, 'email', { required: true });
+  const email = readEmail(req.body?.email);
   const password = readString(req.body?.password, 'password', {
     required: true,
   });
 
-  const user = await User.findOne({ email: email.toLowerCase() }).select(
-    '+password',
-  );
+  const user = await User.findOne({ email }).select('+password');
   if (!user || !(await user.comparePassword(password))) {
     throw new HttpError(401, 'Incorrect email or password');
   }
@@ -113,11 +116,11 @@ const authenticate = async (req) => {
 const signUp = async (req, res) => {
   const photo = req.files?.photo?.[0];
   try {
-    const email = readString(req.body?.email, 'email', { required: true });
+    const email = readEmail(req.body?.email);
     const password = readPassword(req.body?.password);
     const fullName = readString(req.body?.fullName, 'fullName');
 
-    if (await User.exists({ email: email.toLowerCase() })) {
+    if (await User.exists({ email })) {
       throw new HttpError(409, 'A user with this email already exists');
     }
 
@@ -165,9 +168,9 @@ const confirmAccount = async (req, res) => {
  * Send a new confirmation email to an account that isn't active yet.
  */
 const resendConfirmation = async (req, res) => {
-  const email = readString(req.body?.email, 'email', { required: true });
+  const email = readEmail(req.body?.email);
   const user = await User.findOne({
-    email: email.toLowerCase(),
+    email,
     is_active: false,
   });
   if (user) {
@@ -211,8 +214,8 @@ const adminSignIn = async (req, res) => {
  * used to find out which emails have an account.
  */
 const forgotPassword = async (req, res) => {
-  const email = readString(req.body?.email, 'email', { required: true });
-  const user = await User.findOne({ email: email.toLowerCase() });
+  const email = readEmail(req.body?.email);
+  const user = await User.findOne({ email });
 
   if (user) {
     const { code, hash } = createCode();

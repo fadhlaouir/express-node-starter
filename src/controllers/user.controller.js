@@ -4,7 +4,12 @@
 const User = require('../models/user.model');
 const { ROLES } = require('../models/user.model');
 const { toPublicPath, removeUpload } = require('../middlewares/multer');
-const { HttpError, readString, readPassword } = require('../utils/request');
+const {
+  HttpError,
+  readString,
+  readEmail,
+  readPassword,
+} = require('../utils/request');
 
 /* -------------------------------------------------------------------------- */
 /*                               User Controller                              */
@@ -14,8 +19,8 @@ const { HttpError, readString, readPassword } = require('../utils/request');
  * Check whether an email is already registered (for sign-up forms).
  */
 const checkExistEmail = async (req, res) => {
-  const email = readString(req.body?.email, 'email', { required: true });
-  const exists = Boolean(await User.exists({ email: email.toLowerCase() }));
+  const email = readEmail(req.body?.email);
+  const exists = Boolean(await User.exists({ email }));
   res.json({ success: true, exists });
 };
 
