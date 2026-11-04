@@ -46,9 +46,9 @@ npx create-express-node-starter my-api --template auth
 - **Uploads:** images only (JPEG, PNG, GIF, WebP), 5 MB maximum, stored under random names.
 - **Security by default:** Helmet headers, rate limits on every API route and stricter ones on auth routes, NoSQL-injection-safe input, hashed passwords and email codes. See [Security](#security).
 - **API docs:** Swagger UI at `/api-docs/`, from an OpenAPI 3 spec.
-- **Health check** at `/health`, and graceful shutdown.
+- **Health check** at `/health`, and graceful shutdown that finishes in-flight requests but never hangs on a connection left open.
 - **CRUD generator:** `npm run crud:operation -- generate product` writes a working model, controller and routes.
-- **Tests:** 32 integration tests with an in-memory MongoDB; no database to install.
+- **Tests:** 43 integration tests with an in-memory MongoDB; no database to install.
 - **Tooling:** ESLint, Prettier, Husky and lint-staged, conventional-commit releases, Docker and GitHub Actions CI.
 
 ## Requirements
