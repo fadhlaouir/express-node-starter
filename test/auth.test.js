@@ -128,6 +128,18 @@ test('failed sign-ins are limited per account, from any address', async () => {
   assert.ok(await login(agent, bystander.email));
 });
 
+test('following an email link uses an index, not a scan of every user', async () => {
+  const User = require('../src/models/user.model');
+  await User.syncIndexes();
+  for (const field of ['confirmationCode', 'resetPasswordToken']) {
+    const plan = await User.find({ [field]: 'a'.repeat(64) }).explain(
+      'queryPlanner',
+    );
+    const winning = JSON.stringify(plan.queryPlanner.winningPlan);
+    assert.ok(winning.includes('IXSCAN'), `${field}: ${winning}`);
+  }
+});
+
 test('query operators in the body are rejected (NoSQL injection)', async () => {
   await createUser();
   const res = await agent

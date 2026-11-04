@@ -29,9 +29,14 @@ const UserSchema = new mongoose.Schema(
     photo: { type: String, default: '' },
     is_active: { type: Boolean, default: false },
     role: { type: String, enum: ROLES, default: 'is_user' },
-    // Only hashes of the codes sent by email are stored.
-    confirmationCode: { type: String, select: false },
-    resetPasswordToken: { type: String, select: false },
+    // Only hashes of the codes sent by email are stored. Indexed, so following a
+    // link doesn't scan every user; sparse, so only accounts with a code take room.
+    confirmationCode: { type: String, select: false, index: { sparse: true } },
+    resetPasswordToken: {
+      type: String,
+      select: false,
+      index: { sparse: true },
+    },
     resetPasswordExpires: { type: Date, select: false },
     // Tokens issued before this are refused (verify-token.js)
     passwordChangedAt: { type: Date, select: false },
