@@ -2,7 +2,6 @@
 /*                                Dependencies                                */
 /* -------------------------------------------------------------------------- */
 const crypto = require('node:crypto');
-const jwt = require('jsonwebtoken');
 
 // Models
 const User = require('../models/user.model');
@@ -12,8 +11,8 @@ const {
 } = require('../models/user.model');
 
 // Helpers
-const { env } = require('../config/env');
 const { API_ENDPOINT, sendEmail } = require('../utils/helpers');
+const { signToken } = require('../utils/token');
 const {
   HttpError,
   readString,
@@ -34,17 +33,6 @@ const {
 const RESET_TOKEN_TTL = 60 * 60 * 1000; // 1 hour
 const GENERIC_EMAIL_MESSAGE =
   'If an account exists for this email, you will receive instructions shortly';
-
-/**
- * Sign a token with only what the API needs: never the whole user document.
- * @param {import('mongoose').Document} user
- * @returns {string}
- */
-const signToken = (user) =>
-  jwt.sign({ _id: user._id.toString(), role: user.role }, env.jwtSecret, {
-    expiresIn: env.jwtExpiresIn,
-    algorithm: 'HS256',
-  });
 
 /**
  * Public fields returned after sign-in.

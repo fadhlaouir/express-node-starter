@@ -121,7 +121,7 @@ Everything is under `/v1/api`. Full request and response shapes are in Swagger a
 | POST   | `/users/check-email`          | Public                | Whether an email is registered             |
 | GET    | `/users`                      | Admins and managers   | Paginated list: `?page=1&limit=20`         |
 | GET    | `/users/me`                   | Signed in             | The signed-in user                         |
-| PUT    | `/users/me/password`          | Signed in             | Change password (needs the current one)    |
+| PUT    | `/users/me/password`          | Signed in             | Change password, returns a new token       |
 | GET    | `/users/:id`                  | The user, or staff    | One user                                   |
 | PUT    | `/users/:id`                  | The user, or staff    | Update name and photo; admins can set role |
 | DELETE | `/users/:id`                  | The user, or an admin | Delete the account                         |
@@ -191,7 +191,9 @@ This starts the API on port 5000 and MongoDB 8, with uploads and data in Docker 
 - Sign-up never accepts a role or an activation flag from the request. Only admins can change roles.
 - Users can read, update and delete only their own account; staff permissions are explicit per route.
 - Request fields are checked as strings, so `{ "$ne": null }`-style query injection is rejected.
-- Sign-in and password-reset answers don't reveal which emails have accounts.
+- Sign-in and password-reset answers don't reveal which emails have accounts, in what they say or in how long they take.
+- A token is checked against its account on every request: deleting or deactivating the account, or changing or resetting its password, signs it out everywhere, and a role change applies at once. Changing your password returns a new token for the session that made the change.
+- Emails are checked as addresses, and passwords are limited to the 72 bytes bcrypt reads, so a longer one can't match on its first 72 alone.
 - Uploads accept images only, get random file names, and are served from a folder that can't be escaped.
 - Every API route is rate limited (300 requests per IP per 15 minutes by default), public auth routes more strictly, and Helmet sets security headers.
 - Error responses never include stack traces or internal messages in production.

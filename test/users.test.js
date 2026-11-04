@@ -11,6 +11,75 @@ after(teardown);
 
 const auth = (token) => ({ Authorization: `Bearer ${token}` });
 
+/**
+ * A token signed ten seconds ago: tokens count in whole seconds, and one from the
+ * same second as a password change is still accepted.
+ * @param {import('mongoose').Document} user
+ */
+const earlierToken = (user) =>
+  require('jsonwebtoken').sign(
+    {
+      _id: user._id.toString(),
+      role: user.role,
+      iat: Math.floor(Date.now() / 1000) - 10,
+    },
+    process.env.SECRET,
+    { algorithm: 'HS256', expiresIn: '1h' },
+  );
+
+test('changing the password signs out other sessions, not this one', async () => {
+  const user = await createUser();
+  const other = earlierToken(user);
+  const res = await agent
+    .put('/v1/api/users/me/password')
+    .set(auth(other))
+    .send({ currentPassword: 'password123', newPassword: 'a-new-password' })
+    .expect(200);
+  await agent.get('/v1/api/users/me').set(auth(other)).expect(401);
+  await agent.get('/v1/api/users/me').set(auth(res.body.token)).expect(200);
+});
+
+test('resetting the password signs out every session', async () => {
+  const user = await createUser();
+  const stolen = earlierToken(user);
+  await agent.get('/v1/api/users/me').set(auth(stolen)).expect(200);
+
+  await agent
+    .post('/v1/api/auth/forget-password')
+    .send({ email: user.email })
+    .expect(200);
+  const { lastEmailCode } = require('./setup');
+  await agent
+    .post(`/v1/api/auth/reset-password/${lastEmailCode()}`)
+    .send({ newPassword: 'reset-password', verifyPassword: 'reset-password' })
+    .expect(200);
+
+  await agent.get('/v1/api/users/me').set(auth(stolen)).expect(401);
+});
+
+test('a deactivated or deleted account is signed out at once', async () => {
+  const User = require('../src/models/user.model');
+  const deactivated = await createUser();
+  const deactivatedToken = await login(agent, deactivated.email);
+  await User.updateOne({ _id: deactivated._id }, { is_active: false });
+  await agent.get('/v1/api/users/me').set(auth(deactivatedToken)).expect(401);
+
+  const deleted = await createUser();
+  const deletedToken = await login(agent, deleted.email);
+  await User.deleteOne({ _id: deleted._id });
+  await agent.get('/v1/api/users/me').set(auth(deletedToken)).expect(401);
+});
+
+test('a role taken away applies at once, without a new sign-in', async () => {
+  const User = require('../src/models/user.model');
+  const manager = await createUser({ role: 'is_manager' });
+  const token = await login(agent, manager.email);
+  await agent.get('/v1/api/users').set(auth(token)).expect(200);
+
+  await User.updateOne({ _id: manager._id }, { role: 'is_user' });
+  await agent.get('/v1/api/users').set(auth(token)).expect(403);
+});
+
 test('user routes require a token', async () => {
   const user = await createUser();
   await agent.get(`/v1/api/users/${user._id}`).expect(401);
@@ -102,7 +171,8 @@ test('a user can delete their own account', async () => {
   const user = await createUser();
   const token = await login(agent, user.email);
   await agent.delete(`/v1/api/users/${user._id}`).set(auth(token)).expect(200);
-  await agent.get('/v1/api/users/me').set(auth(token)).expect(404);
+  // The account is gone, and its token with it
+  await agent.get('/v1/api/users/me').set(auth(token)).expect(401);
 });
 
 test('an invalid id is a 400, not a server error', async () => {

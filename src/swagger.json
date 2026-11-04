@@ -363,6 +363,7 @@
       "put": {
         "tags": ["Users"],
         "summary": "Change the signed-in user's password",
+        "description": "Signs out every other session. The response carries a new token for this one.",
         "security": [{ "bearerAuth": [] }],
         "requestBody": {
           "required": true,
@@ -373,14 +374,32 @@
                 "required": ["currentPassword", "newPassword"],
                 "properties": {
                   "currentPassword": { "type": "string" },
-                  "newPassword": { "type": "string", "minLength": 8 }
+                  "newPassword": {
+                    "type": "string",
+                    "minLength": 8,
+                    "description": "8 characters to 72 bytes"
+                  }
                 }
               }
             }
           }
         },
         "responses": {
-          "200": { "$ref": "#/components/responses/Message" },
+          "200": {
+            "description": "Password changed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "message": { "type": "string" },
+                    "token": { "type": "string" }
+                  }
+                }
+              }
+            }
+          },
           "401": { "$ref": "#/components/responses/Message" },
           "422": { "$ref": "#/components/responses/Message" }
         }

@@ -4,6 +4,7 @@
 const User = require('../models/user.model');
 const { ROLES } = require('../models/user.model');
 const { toPublicPath, removeUpload } = require('../middlewares/multer');
+const { signToken } = require('../utils/token');
 const {
   HttpError,
   readString,
@@ -106,7 +107,8 @@ const updateUserById = async (req, res) => {
 };
 
 /**
- * Change the signed-in user's password. Requires the current password.
+ * Change the signed-in user's password. Requires the current password. Every other
+ * session is signed out; this one gets a new token so it stays signed in.
  */
 const changePassword = async (req, res) => {
   const currentPassword = readString(
@@ -124,7 +126,11 @@ const changePassword = async (req, res) => {
 
   user.password = newPassword;
   await user.save();
-  res.json({ success: true, message: 'Password changed' });
+  res.json({
+    success: true,
+    message: 'Password changed',
+    token: signToken(user),
+  });
 };
 
 /**

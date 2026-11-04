@@ -33,6 +33,8 @@ const UserSchema = new mongoose.Schema(
     confirmationCode: { type: String, select: false },
     resetPasswordToken: { type: String, select: false },
     resetPasswordExpires: { type: Date, select: false },
+    // Tokens issued before this are refused (verify-token.js)
+    passwordChangedAt: { type: Date, select: false },
   },
   { timestamps: { createdAt: 'joined_at', updatedAt: 'updated_at' } },
 );
@@ -41,10 +43,12 @@ const UserSchema = new mongoose.Schema(
 /*                              Password helpers                              */
 /* -------------------------------------------------------------------------- */
 
-// Hash the password whenever it is created or changed.
+// Hash the password whenever it is created or changed. A change also signs out
+// every session that was open with the old one.
 UserSchema.pre('save', async function () {
   if (this.isModified('password')) {
     this.password = await bcrypt.hash(this.password, SALT_ROUNDS);
+    if (!this.isNew) this.passwordChangedAt = new Date();
   }
 });
 
@@ -83,6 +87,7 @@ UserSchema.set('toJSON', {
     delete ret.confirmationCode;
     delete ret.resetPasswordToken;
     delete ret.resetPasswordExpires;
+    delete ret.passwordChangedAt;
     delete ret.__v;
     return ret;
   },
