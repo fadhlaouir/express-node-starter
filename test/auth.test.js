@@ -103,6 +103,31 @@ test('an unknown email takes as long to refuse as a wrong password', async () =>
   assert.ok(unknown > known * 0.5, `unknown ${unknown}ms, known ${known}ms`);
 });
 
+test('failed sign-ins are limited per account, from any address', async () => {
+  const target = await createUser();
+  const bystander = await createUser();
+  // The default limit: 10 failed sign-ins per account per 15 minutes
+  for (let i = 0; i < 10; i += 1) {
+    await agent
+      .post('/v1/api/auth/login')
+      .set('X-Forwarded-For', `203.0.113.${i}`)
+      .send({ email: target.email, password: `guess-${i}-wrong` })
+      .expect(401);
+  }
+  // Even the right password, in another case, waits until the window ends
+  const locked = await agent
+    .post('/v1/api/auth/login')
+    .send({ email: target.email.toUpperCase(), password: 'password123' });
+  assert.equal(locked.status, 429);
+  // ...through the back-office sign-in too
+  await agent
+    .post('/v1/api/auth/admin/login')
+    .send({ email: target.email, password: 'password123' })
+    .expect(429);
+  // Other accounts are not affected
+  assert.ok(await login(agent, bystander.email));
+});
+
 test('query operators in the body are rejected (NoSQL injection)', async () => {
   await createUser();
   const res = await agent

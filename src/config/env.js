@@ -32,6 +32,8 @@ const env = {
   authRateLimit: Number(process.env.AUTH_RATE_LIMIT) || 20,
   // Rate limit for every API route: requests per IP per 15 minutes
   apiRateLimit: Number(process.env.API_RATE_LIMIT) || 300,
+  // Failed sign-ins per account per 15 minutes, from any address
+  loginAccountRateLimit: Number(process.env.LOGIN_ACCOUNT_RATE_LIMIT) || 10,
 
   // Mailer: emails are skipped (and logged outside production) when unset
   mailer: {

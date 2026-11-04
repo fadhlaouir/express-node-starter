@@ -101,6 +101,7 @@ All of them are in [`.env.example`](.env.example). `npm start` and `npm run dev`
 | `CORS_ORIGIN`                                                                                 | No (`*`)    | Allowed origins, comma-separated                         |
 | `API_RATE_LIMIT`                                                                              | No (`300`)  | Requests per IP per 15 minutes on every API route        |
 | `AUTH_RATE_LIMIT`                                                                             | No (`20`)   | Requests per IP per 15 minutes on public auth routes     |
+| `LOGIN_ACCOUNT_RATE_LIMIT`                                                                    | No (`10`)   | Failed sign-ins per account per 15 minutes, any address  |
 | `MAILER_EMAIL_ID`, `MAILER_PASSWORD`, `MAILER_SERVICE_PROVIDER`, `HOST`, `PORT_SSL`, `SECURE` | For emails  | SMTP settings for nodemailer                             |
 
 The server refuses to start without a database URL or `SECRET`, and tells you which one is missing.
@@ -196,6 +197,7 @@ This starts the API on port 5000 and MongoDB 8, with uploads and data in Docker 
 - Emails are checked as addresses, and passwords are limited to the 72 bytes bcrypt reads, so a longer one can't match on its first 72 alone.
 - Uploads accept images only, get random file names, and are served from a folder that can't be escaped.
 - Every API route is rate limited (300 requests per IP per 15 minutes by default), public auth routes more strictly, and Helmet sets security headers.
+- Failed sign-ins are also limited per account (10 per 15 minutes by default), so guessing one account's password from many addresses stops too. A successful sign-in doesn't count. The limits are kept in memory: with several instances behind a load balancer, give `express-rate-limit` a shared store such as Redis.
 - Error responses never include stack traces or internal messages in production.
 
 Found a vulnerability? Please report it privately: see the [security policy](SECURITY.md).

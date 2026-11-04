@@ -5,7 +5,10 @@ const router = require('express').Router();
 
 // Middlewares
 const { fileUpload } = require('../middlewares/multer');
-const { authLimiter } = require('../middlewares/rate-limit');
+const {
+  authLimiter,
+  loginAccountLimiter,
+} = require('../middlewares/rate-limit');
 
 // Controllers
 const authController = require('../controllers/auth.controller');
@@ -27,10 +30,14 @@ router.post('/auth/confirm/:code', authController.confirmAccount);
 router.post('/auth/resend-confirmation', authController.resendConfirmation);
 
 // POST request - Sign in
-router.post('/auth/login', authController.signIn);
+router.post('/auth/login', loginAccountLimiter, authController.signIn);
 
 // POST request - Sign in to the back office (admins and managers)
-router.post('/auth/admin/login', authController.adminSignIn);
+router.post(
+  '/auth/admin/login',
+  loginAccountLimiter,
+  authController.adminSignIn,
+);
 
 // POST request - Email a password reset link
 router.post('/auth/forget-password', authController.forgotPassword);
