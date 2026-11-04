@@ -1,6 +1,6 @@
 {
   "name": "express-node-starter",
-  "version": "2.1.1",
+  "version": "2.2.0",
   "description": "Secure Express 5 and MongoDB starter for REST APIs: JWT authentication, roles, account confirmation, password reset, uploads, Swagger docs, tests and a CRUD generator.",
   "main": "server.js",
   "author": "Raed Fadhlaoui <raed.fadhlaoui@hotmail.com>",

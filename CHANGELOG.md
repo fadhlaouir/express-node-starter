@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.2.0](https://github.com/fadhlaouir/express-node-starter/compare/v2.1.1...v2.2.0) (2026-11-04)
+
+### Features
+
+* **auth:** limit failed sign-ins per account, from any address ([840b994](https://github.com/fadhlaouir/express-node-starter/commit/840b994aee68dda3b42f1a53b7331008c571a583))
+
+### Bug Fixes
+
+* **auth:** reject invalid emails and passwords longer than bcrypt reads ([4ba10b1](https://github.com/fadhlaouir/express-node-starter/commit/4ba10b18d8d0fc5eb853cbf00531cdf72a3b6f9d))
+* **auth:** sign a token out when its account changes ([19f4133](https://github.com/fadhlaouir/express-node-starter/commit/19f413342e69e907e1f092e9eebefa1ba3242190))
+* **auth:** take as long to refuse an unknown email as a wrong password ([a5dbef6](https://github.com/fadhlaouir/express-node-starter/commit/a5dbef636f02714037fa1c9ada5c807a65fd92dc))
+* **server:** stop waiting for open connections after a timeout ([ce7b61c](https://github.com/fadhlaouir/express-node-starter/commit/ce7b61cdc528ed891cc0d4b9d421aaac65649dbc))
+
+### Performance
+
+* **auth:** index the codes email links are looked up by ([d5da1cd](https://github.com/fadhlaouir/express-node-starter/commit/d5da1cdcd40c167b9015e5f085d7b4321ba2c455))
+
 ## [2.1.1](https://github.com/fadhlaouir/express-node-starter/compare/v2.1.0...v2.1.1) (2026-11-03)
 
 ### Bug Fixes
