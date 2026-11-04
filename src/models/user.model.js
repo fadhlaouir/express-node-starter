@@ -58,6 +58,24 @@ UserSchema.methods.comparePassword = function (password) {
   return bcrypt.compare(password, this.password);
 };
 
+// A hash of a random value, made once with the same cost as real ones
+const dummyHash = bcrypt.hash(
+  crypto.randomBytes(16).toString('hex'),
+  SALT_ROUNDS,
+);
+
+/**
+ * Spend the time of a password check when no account matches, so that signing in
+ * with an unknown email takes as long as with a wrong password and the response
+ * time doesn't reveal which accounts exist. Always false.
+ * @param {string} password
+ * @returns {Promise<false>}
+ */
+async function comparePasswordWithoutUser(password) {
+  await bcrypt.compare(password, await dummyHash);
+  return false;
+}
+
 // Never send secrets in API responses, even when they were selected.
 UserSchema.set('toJSON', {
   transform(doc, ret) {
@@ -82,3 +100,4 @@ function hashToken(token) {
 module.exports = mongoose.model('User', UserSchema);
 module.exports.ROLES = ROLES;
 module.exports.hashToken = hashToken;
+module.exports.comparePasswordWithoutUser = comparePasswordWithoutUser;

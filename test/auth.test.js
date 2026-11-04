@@ -82,6 +82,27 @@ test('wrong email and wrong password give the same answer', async () => {
   assert.equal(wrongPassword.body.message, unknownEmail.body.message);
 });
 
+test('an unknown email takes as long to refuse as a wrong password', async () => {
+  const user = await createUser();
+  const time = async (email) => {
+    const start = process.hrtime.bigint();
+    await agent
+      .post('/v1/api/auth/login')
+      .send({ email, password: 'not-the-password' })
+      .expect(401);
+    return Number(process.hrtime.bigint() - start) / 1e6;
+  };
+  // Warm up, then take the best of three of each so a slow moment doesn't decide
+  await time('warm-up@example.com');
+  const best = async (email) =>
+    Math.min(await time(email), await time(email), await time(email));
+  const known = await best(user.email);
+  const unknown = await best('nobody-here@example.com');
+  // Without the dummy check an unknown email answers in a few milliseconds,
+  // against a few hundred for a bcrypt comparison
+  assert.ok(unknown > known * 0.5, `unknown ${unknown}ms, known ${known}ms`);
+});
+
 test('query operators in the body are rejected (NoSQL injection)', async () => {
   await createUser();
   const res = await agent

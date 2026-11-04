@@ -6,7 +6,10 @@ const jwt = require('jsonwebtoken');
 
 // Models
 const User = require('../models/user.model');
-const { hashToken } = require('../models/user.model');
+const {
+  hashToken,
+  comparePasswordWithoutUser,
+} = require('../models/user.model');
 
 // Helpers
 const { env } = require('../config/env');
@@ -93,7 +96,10 @@ const authenticate = async (req) => {
   });
 
   const user = await User.findOne({ email }).select('+password');
-  if (!user || !(await user.comparePassword(password))) {
+  const passwordMatches = user
+    ? await user.comparePassword(password)
+    : await comparePasswordWithoutUser(password);
+  if (!passwordMatches) {
     throw new HttpError(401, 'Incorrect email or password');
   }
   if (!user.is_active) {
