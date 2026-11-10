@@ -1,6 +1,6 @@
 // Generates a real CRUD into src/, exercises its routes, then deletes it.
 
-const { test, before, after } = require('node:test');
+const { test, before, after, mock } = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const request = require('supertest');
@@ -8,6 +8,10 @@ const { generate } = require('../cli');
 const { deleteCrud } = require('../cli/_/deleteCrud');
 const { entityFiles, validateEntityName } = require('../cli/_/helpers');
 const { setup, teardown, createUser, login } = require('./setup');
+
+// The generator reports what it writes on the console. Keep that out of the test
+// runner's own output, which Node 22 can misread ("Unable to deserialize cloned data").
+mock.method(console, 'log', () => {});
 
 const ENTITY = 'zzgadget';
 let agent;
