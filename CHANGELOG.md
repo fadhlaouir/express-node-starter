@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.2.1](https://github.com/fadhlaouir/express-node-starter/compare/v2.2.0...v2.2.1) (2026-11-12)
+
+### Bug Fixes
+
+* **deps:** move minimatch past the globparts advisory ([dbb75f6](https://github.com/fadhlaouir/express-node-starter/commit/dbb75f6c83caa71c643788c9daad3368db370b21))
+
 ## [2.2.0](https://github.com/fadhlaouir/express-node-starter/compare/v2.1.1...v2.2.0) (2026-11-04)
 
 ### Features
