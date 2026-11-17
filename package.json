@@ -41,10 +41,8 @@
     "format:check": "prettier --check .",
     "format:fix": "prettier --write .",
     "crud:operation": "node cli/index.js",
-    "release": "commit-and-tag-version",
-    "release:minor": "commit-and-tag-version --release-as minor",
-    "release:major": "commit-and-tag-version --release-as major",
-    "release:dry": "commit-and-tag-version --dry-run",
+    "release": "commit-and-tag-version --release-as patch",
+    "release:dry": "commit-and-tag-version --release-as patch --dry-run",
     "prepare": "husky"
   },
   "dependencies": {
